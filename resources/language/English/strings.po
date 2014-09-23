@@ -1,0 +1,83 @@
+# XBMC Media Center language file
+# Addon Name: Pushbullet Client
+# Addon id: service.pushbullet
+# Addon Provider: Muttley
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC Addons\n"
+"Report-Msgid-Bugs-To: muttley.bd@gmail.com\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: muttley\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# SETTINGS
+
+# Category
+msgctxt "#30000"
+msgid "Main"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Device info"
+msgstr ""
+
+# Separators
+msgctxt "#30010"
+msgid "Account"
+msgstr ""
+
+msgctxt "#30011"
+msgid "Settings"
+msgstr ""
+
+msgctxt "#30012"
+msgid "Notifications Appname Filters"
+msgstr ""
+
+# Items
+msgctxt "#30040"
+msgid "Access Token"
+msgstr ""
+
+msgctxt "#30041"
+msgid "Duration Notification (seconds)"
+msgstr ""
+
+msgctxt "#30042"
+msgid "View notifications from others devices (mirror/sync mode)"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Deny"
+msgstr ""
+
+msgctxt "#30044"
+msgid "Allow"
+msgstr "sdfsdfsd"
+
+msgctxt "#30050"
+msgid "Iden"
+msgstr ""
+
+msgctxt "#30051"
+msgid "Nickname"
+msgstr ""
+
+msgctxt "#30052"
+msgid "Model"
+msgstr ""
+
+# ADDON STRINGS
+
+msgctxt "#30100"
+msgid "You have to set ACCESS TOKEN in add-on settings"
+msgstr ""
+
+msgctxt "#30101"
+msgid "Error"
+msgstr ""
