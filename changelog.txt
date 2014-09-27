@@ -1,2 +1,7 @@
+[B]0.6.6b[/B]
+- Playback pushed link (youtube plugin supported)
+- Sync/Mirroring: Send notifications to others devices (outbound mode):
+- Media info playback (song and movie info with their thumbs!)
+
 [B]0.6.0b[/B]
 - Hello Pushbullet :)

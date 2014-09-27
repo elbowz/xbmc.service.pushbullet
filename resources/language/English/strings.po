@@ -23,6 +23,14 @@ msgid "Main"
 msgstr ""
 
 msgctxt "#30001"
+msgid "Sync in"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Sync out"
+msgstr ""
+
+msgctxt "#30003"
 msgid "Device info"
 msgstr ""
 
@@ -36,39 +44,49 @@ msgid "Settings"
 msgstr ""
 
 msgctxt "#30012"
-msgid "Notifications Appname Filters"
+msgid "Filter by Appname (title of notification separated by space)"
 msgstr ""
 
 # Items
-msgctxt "#30040"
+msgctxt "#30030"
 msgid "Access Token"
 msgstr ""
 
+msgctxt "#30031"
+msgid "Hide notifications automatically after (seconds)"
+msgstr ""
+
+
+msgctxt "#30040"
+msgid "View notifications of others devices"
+msgstr ""
+
 msgctxt "#30041"
-msgid "Duration Notification (seconds)"
-msgstr ""
-
-msgctxt "#30042"
-msgid "View notifications from others devices (mirror/sync mode)"
-msgstr ""
-
-msgctxt "#30043"
 msgid "Deny"
 msgstr ""
 
-msgctxt "#30044"
+msgctxt "#30042"
 msgid "Allow"
-msgstr "sdfsdfsd"
+msgstr ""
 
 msgctxt "#30050"
-msgid "Iden"
+msgid "Send notifications to others devices"
 msgstr ""
 
 msgctxt "#30051"
+msgid "Media info playback"
+msgstr ""
+
+
+msgctxt "#30060"
+msgid "Iden"
+msgstr ""
+
+msgctxt "#30061"
 msgid "Nickname"
 msgstr ""
 
-msgctxt "#30052"
+msgctxt "#30062"
 msgid "Model"
 msgstr ""
 

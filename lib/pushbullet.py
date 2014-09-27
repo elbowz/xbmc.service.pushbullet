@@ -8,12 +8,13 @@ class Pushbullet():
     Higher level of Pushbullet APIs are provided.
     """
 
-    def __init__(self, access_token=None, iden=None, filter_deny={}, filter_allow={}, mirror_mode=True,
-                 base_url='https://api.pushbullet.com/v2/', ping_timeout=2,
+    def __init__(self, access_token=None, user_iden=None, device_iden=None, filter_deny={}, filter_allow={},
+                 mirror_mode=True, base_url='https://api.pushbullet.com/v2/', ping_timeout=2,
                  json_format_response=True):
         """
         access_token: access toke.
-        iden: used for send and receive push (if not set receive all pushes)
+        user_iden; used for send and receive ephemerals (if not set receive all pushes)
+        device_iden: used for send and receive push (if not set receive all pushes)
         filter_deny: object with key as push JSON fields to deny
         filter_allow: object with key as push JSON fields to allow
         mirror_mode: get pushes from other devices
@@ -26,7 +27,8 @@ class Pushbullet():
             raise Exception('You must define access_token')
 
         self.access_token = access_token
-        self.iden = iden
+        self.user_iden = user_iden
+        self.device_iden = device_iden
         self.filter_deny = filter_deny
         self.filter_allow = filter_allow
         self.mirror_mode = mirror_mode
@@ -42,6 +44,7 @@ class Pushbullet():
             'devices': 'devices',
             'contacts': 'contacts',
             'me': 'users/me',
+            'ephemerals': 'ephemerals',
             'websocket': 'wss://stream.pushbullet.com/websocket/'
         }
 
@@ -96,13 +99,13 @@ class Pushbullet():
             self.base_url + self._REST_URLS['pushes'] + '?modified_after=' + str(modified_after), method='GET')
 
         pushes = self._getResponse(json_format_response=True)['pushes']
+
         # filter: only active == True
         pushes = [push for push in pushes if push['active']]
 
-        # filter: for this device (iden)
-        if self.iden:
-            pushes = [push for push in pushes if push['target_device_iden'] == self.iden]
-
+        # filter: for this device target (iden)
+        if self.device_iden:
+            pushes = [push for push in pushes if ('target_device_iden' in push and push['target_device_iden'] == self.device_iden)]
 
         if len(pushes):
             # save modified time for next query on pushes
@@ -203,10 +206,18 @@ class Pushbullet():
 
         # message type: mirror
         if self.mirror_mode and data['type'] == 'push' and data['push']['type'] == 'mirror':
-            push = self.filter(data['push'], self.filter_deny, self.filter_allow)[0]
+            pushes = data['push']
 
-            if push:
-                self._user_on_message(push)
+            # remove/ignore pushes send by this client
+            if self.device_iden is not None:
+                pushes = self.filter(pushes, filter_deny={'source_device_iden': [self.device_iden]})
+
+            # apply object/user filters
+            if len(pushes):
+                pushes = self.filter(pushes, self.filter_deny, self.filter_allow)
+
+                if len(pushes):
+                    self._user_on_message(pushes[0])
 
         # something has changed on the server /v2/pushes resources
         elif data['type'] == 'tickle' and data['subtype'] == 'push':
@@ -219,11 +230,57 @@ class Pushbullet():
     def _on_error(self, websocket, error):
         self._user_on_error(error)
 
-    def setIden(self, iden):
+    def sendEphemeral(self, data, json_format_response=None):
+        """
+        Send arbitrary JSON messages, called "ephemerals", to all devices on your account.
+        """
+
+        # init defautl data
+        data.update({
+            'type': 'mirror',
+            'package_name': 'com.pushbullet.xbmc',
+            'notification_tag': None,
+            'has_root': True,
+            'client_version': 125
+        })
+
+        data['application_name'] = data['application_name'] if 'application_name' in data is not None else 'Kodi'
+        data['dismissable'] = data['dismissable'] if 'dismissable' in data is not None else True
+
+        import sys
+        import random
+        data['notification_id'] = data['notification_id'] if 'notification_id' in data is not None else random.randint(-sys.maxint-1, sys.maxint)
+
+        if self.user_iden is None:
+            self.user_iden = self.getUserInfo(json_format_response=True)['iden']
+
+        data['source_user_iden'] = self.user_iden
+
+        if self.device_iden is None:
+            raise Exception('You must define device_iden for send ephemeral')
+
+        data['source_device_iden'] = self.device_iden
+
+        data = {'type': 'push', 'push': data}
+
+        data = json.dumps(data)
+
+        self._response = self._h.request(self.base_url + self._REST_URLS['ephemerals'], method='POST', body=data,
+                                         headers={'Content-Type': 'application/json'})
+
+        return self._getResponse(json_format_response=json_format_response)
+
+    def setDeviceIden(self, iden):
         """
         Set iden (for send or receive push)
         """
-        self.iden = iden
+        self.device_iden = iden
+
+    def setUserIden(self, iden):
+        """
+        Set iden (for send or receive ephemerals)
+        """
+        self.user_iden = iden
 
     def setFilterDeny(self, filter_deny):
         """

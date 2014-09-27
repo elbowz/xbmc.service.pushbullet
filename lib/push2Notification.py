@@ -1,5 +1,5 @@
 import xbmc
-from lib.common import log, localise, showNotification
+from lib.common import log, localise, showNotification, base64ToFile
 
 class Push2Notification():
     """
@@ -14,21 +14,48 @@ class Push2Notification():
         from os.path import join
         self.imgFilePath = join(self.tempPath, 'temp-notification-icon')
 
+        import re
+        self.re_youtubeMatchLink = re.compile('http://youtu\.be/(?P<id>[a-zA-Z0-9]+)', re.IGNORECASE)
+        self.re_youtubeMatch2Link = re.compile('https?://www\.youtube\.com/watch\?v=(?P<id>[a-zA-Z0-9]+)', re.IGNORECASE)
+
     def onMessage(self, message):
-        from json import dumps
-        log('New push received: ' + dumps(message))
+        try:
+            from json import dumps
+            log('New push (%s) received: %s' % (message['type'], dumps(message)))
 
-        if message['type'] == 'mirror':
-            if 'icon' in message:
-                iconPath = self._base64Img2file(message['icon'])
-                body = message['body'].replace("\n", " / ") if 'body' in message else ''
+            if message['type'] == 'mirror':
+                if 'icon' in message:
+                    iconPath = base64ToFile(message['icon'], self.imgFilePath, imgFormat='JPEG', imgSize=(96, 96))
 
-                showNotification(message["application_name"], body, self.notificationTime, iconPath)
-        else:
-            title = message['title'] if 'title' in message else ''
-            body = message['body'].replace("\n", " / ") if 'body' in message else ''
+                    if 'body' in message:
+                        if message['body'].endswith('\n'): message['body'] = message['body'][:-1]
+                        body = message['body'].replace('\n', ' / ')
+                    else:
+                        body = None
 
-            showNotification(title, body, self.notificationTime, self.notificationIcon)
+                    showNotification(message["application_name"], body, self.notificationTime, iconPath)
+            else:
+                if message['type'] == 'link':
+                    self._onMessageLink(message)
+                elif message['type'] == 'note':
+                    title = message['title'] if 'title' in message else ''
+                    body = message['body'].replace("\n", " / ") if 'body' in message else ''
+
+                    showNotification(title, body, self.notificationTime, self.notificationIcon)
+
+        except Exception as ex:
+            log(ex.args[0], xbmc.LOGERROR)
+
+    def _onMessageLink(self, message):
+        match = self.re_youtubeMatchLink.search(message['url'])
+        if match:
+            return playYoutubeVideo(match.group('id'))
+
+        match = self.re_youtubeMatch2Link.search(message['url'])
+        if match:
+            return playYoutubeVideo(match.group('id'))
+
+        playMedia(message['url'])
 
     def onError(self, error):
         log(error, xbmc.LOGERROR)
@@ -40,17 +67,17 @@ class Push2Notification():
     def onOpen(self):
         log('Socket opened')
 
-    def _base64Img2file(self, base64Img, imgFilePath=None):
-        imgFilePath = self.imgFilePath if imgFilePath is None else imgFilePath
-
-        import base64
-        imgDecoded = base64.b64decode(base64Img)
-
-        file = open(imgFilePath, "wb")
-        file.write(imgDecoded)
-        file.close()
-
-        return imgFilePath
-
     def setNotificationTime(self, notificationTime):
         self.notificationTime = notificationTime
+
+def playYoutubeVideo(id):
+    log('Opening Youtube video (%s) plugin' % id)
+
+    playMedia('plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=' + str(id))
+
+def playMedia(url):
+    log('Play media: ' + url)
+
+    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Playlist.Clear","params":{"playlistid":1}}')
+    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Playlist.Add","params":{"playlistid":1,"item":{"file":"' + str(url) + '"}}}')
+    return xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Player.Open","params":{"item":{"playlistid":1,"position":0}}}')
