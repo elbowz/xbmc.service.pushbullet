@@ -23,9 +23,13 @@ def log(txt, level=xbmc.LOGDEBUG):
     xbmc.log(msg=message.encode("utf-8"), level=level)
 
 
+def traceError():
+    import traceback
+    xbmc.log(traceback.format_exc(), level=xbmc.LOGERROR)
+
 def showNotification(title, message, timeout=2000, icon=__addonicon__):
     xbmc.executebuiltin('Notification(%s,%s,%s,%s)' % (
-        title.encode('utf-8', 'ignore'), message.encode('utf-8', 'ignore'), timeout, icon))
+        str(title).encode('utf-8', 'ignore'), str(message).encode('utf-8', 'ignore'), timeout, icon))
 
 
 def executeJSONRPC(jsonStr):

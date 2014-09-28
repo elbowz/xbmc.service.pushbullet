@@ -1,5 +1,5 @@
 import xbmc
-from lib.common import log, localise, showNotification, base64ToFile
+from lib.common import *
 
 class Push2Notification():
     """
@@ -44,7 +44,8 @@ class Push2Notification():
                     showNotification(title, body, self.notificationTime, self.notificationIcon)
 
         except Exception as ex:
-            log(ex.args[0], xbmc.LOGERROR)
+            traceError()
+            log(' '.join(str(arg) for arg in ex.args), xbmc.LOGERROR)
 
     def _onMessageLink(self, message):
         match = self.re_youtubeMatchLink.search(message['url'])

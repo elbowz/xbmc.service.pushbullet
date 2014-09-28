@@ -30,7 +30,7 @@ class Service:
 
         # xbmc icon (used as ephemerals icon)
         import os
-        xbmcImgPath = os.path.join(__addonpath__, 'resources/media/xbmc.jpg')
+        xbmcImgPath = os.path.join(__addonpath__, 'resources', 'media', 'xbmc.jpg')
 
         import base64
         with open(xbmcImgPath, "rb") as imgFile:
@@ -51,7 +51,7 @@ class Service:
 
         log('Closing socket (waiting...)')
 
-        self.pushbullet.close()
+        if self.pushbullet: self.pushbullet.close()
 
         log('Service closed')
 
@@ -62,9 +62,7 @@ class Service:
 
         if self.pushbullet:
             log('Restarting')
-
             self.pushbullet.close()
-            del self.pushbullet
 
         try:
             if not self.stg_pbAccessToken:
@@ -94,8 +92,11 @@ class Service:
             log('Started successful')
 
         except Exception as ex:
-            log(ex.args[0], xbmc.LOGERROR)
-            showNotification(localise(30101), ex.args[0], self.serviceNotifcationTime)
+            traceError()
+            message = ' '.join(str(arg) for arg in ex.args)
+
+            log(message, xbmc.LOGERROR)
+            showNotification(localise(30101), message, self.serviceNotifcationTime)
 
     def _setupService(self):
         log('Setup Service and Pushbullet Client')
@@ -217,38 +218,33 @@ class Service:
                 if data['item']['type'] == 'movie':
                     result = executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GetItem", "params": { "properties": ["title","year","tagline","thumbnail","file"], "playerid": ' + str(playerId) + ' }, "id": "1"}')
 
-                    if 'title' in result['item']:
+                    if 'title' in result['item'] and result['item'] != '':
                         title = '%s (%s)' % (result['item']['title'], result['item']['year'])
                         body = result['item']['tagline']
                     else:
                         title = result['item']['file']
                         body = None
 
-                    if 'thumbnail' in result['item']:
-                        posterFile = result['item']['thumbnail']
-                        icon = fileTobase64(posterFile, imgFormat='JPEG', imgSize=(80, 80))
-                    else:
-                        icon = self.xbmcImgEncoded
-
-                    ephemeralMsg = {'title': title, 'body': body, 'notification_id': self.notificationId, 'icon': icon}
-
                 elif data['item']['type'] == 'song':
                     result = executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GetItem", "params": { "properties": ["title","album","artist","thumbnail","file"], "playerid": ' + str(playerId) + ' }, "id": "1"}')
 
-                    if 'title' in result['item']:
+                    if 'title' in result['item'] and result['item'] != '':
                         title = result['item']['title']
                         body = '%s / %s' % (result['item']['album'], ', '.join(result['item']['artist']))
                     else:
                         title = result['item']['file']
                         body = None
 
-                    if 'thumbnail' in result['item']:
-                        posterFile = result['item']['thumbnail']
-                        icon = fileTobase64(posterFile, imgFormat='JPEG', imgSize=(80, 80))
-                    else:
+                if 'thumbnail' in result['item']:
+                    thumbnailFilePath = result['item']['thumbnail']
+                    try:
+                        icon = fileTobase64(thumbnailFilePath, imgFormat='JPEG', imgSize=(80, 80))
+                    except:
                         icon = self.xbmcImgEncoded
+                else:
+                    icon = self.xbmcImgEncoded
 
-                    ephemeralMsg = {'title': title, 'body': body, 'notification_id': self.notificationId, 'icon': icon}
+                ephemeralMsg = {'title': title, 'body': body, 'notification_id': self.notificationId, 'icon': icon}
 
                 if len(self.pushbullet.sendEphemeral(ephemeralMsg)) == 0:
                     log('Ephemeral push sended: %s - %s' % (ephemeralMsg['title'], ephemeralMsg['body']))

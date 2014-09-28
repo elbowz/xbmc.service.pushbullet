@@ -5,4 +5,4 @@ import lib.common
 # add ./lib/external to PYTHONPATH
 __addonpath__    = lib.common.__addonpath__
 
-sys.path.append(os.path.join(__addonpath__, 'lib/external'))
+sys.path.append(os.path.join(__addonpath__, 'lib', 'external'))

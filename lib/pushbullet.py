@@ -36,7 +36,7 @@ class Pushbullet():
         self.ping_timeout = ping_timeout
         self.json_format_response = json_format_response
 
-        self._h = httplib2.Http(".cache")
+        self._h = httplib2.Http()
         self._h.add_credentials(self.access_token, '')
 
         self._REST_URLS = {
@@ -107,9 +107,16 @@ class Pushbullet():
         if self.device_iden:
             pushes = [push for push in pushes if ('target_device_iden' in push and push['target_device_iden'] == self.device_iden)]
 
+        # filter: only not dismissed
+        pushes = [push for push in pushes if ('dismissed' in push and push['dismissed'] is False)]
+
         if len(pushes):
             # save modified time for next query on pushes
             self._last_modified = pushes[0]['modified']
+
+            # pushes dismiss
+            for push in pushes:
+                self.dismissPush(push['iden'])
 
         return pushes
 
@@ -159,10 +166,19 @@ class Pushbullet():
 
         return self._getResponse(json_format_response=json_format_response)
 
+    def dismissPush(self, iden, json_format_response=None):
+        data = json.dumps({'dismissed': True})
+
+        self._response = self._h.request(self.base_url + self._REST_URLS['pushes'] + '/' + str(iden), method='POST', body=data,
+                                         headers={'Content-Type': 'application/json'})
+
+        return self._getResponse(json_format_response=json_format_response)
+
     def _getResponse(self, response=None, json_format_response=None):
         response = self._response if response is None else response
         json_format_response = self.json_format_response if json_format_response is None else json_format_response
 
+        # response is not 200
         if response[0].status != 200:
             raise Exception('Pushbullet server response: (%d) %s' % (
                 response[0].status, json.loads(response[1])['error']['message']))
@@ -309,7 +325,4 @@ class Pushbullet():
             self._ws.close()
         if self._ws_thread:
             self._ws_thread.join()
-
-    def __del__(self):
-        self.close()
 
