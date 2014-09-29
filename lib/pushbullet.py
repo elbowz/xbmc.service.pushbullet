@@ -254,18 +254,19 @@ class Pushbullet():
         # init defautl data
         data.update({
             'type': 'mirror',
-            'package_name': 'com.pushbullet.xbmc',
+            'package_name': 'com.pushbullet.android',
             'notification_tag': None,
             'has_root': True,
             'client_version': 125
         })
 
-        data['application_name'] = data['application_name'] if 'application_name' in data is not None else 'Kodi'
+        # application_name != 'Pushbullet' => not viewed on Chrome Pushbullet extension
+        data['application_name'] = data['application_name'] if 'application_name' in data is not None else 'Pushbullet'
         data['dismissable'] = data['dismissable'] if 'dismissable' in data is not None else True
 
         import sys
         import random
-        data['notification_id'] = data['notification_id'] if 'notification_id' in data is not None else random.randint(-sys.maxint-1, sys.maxint)
+        data['notification_id'] = str(data['notification_id']) if 'notification_id' in data is not None else str(random.randint(-sys.maxint-1, sys.maxint))
 
         if self.user_iden is None:
             self.user_iden = self.getUserInfo(json_format_response=True)['iden']

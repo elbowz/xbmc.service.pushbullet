@@ -71,7 +71,7 @@ class Service:
             from lib.pushbullet import Pushbullet
 
             # init pushbullet
-            self.pushbullet = Pushbullet(access_token=self.stg_pbAccessToken)
+            self.pushbullet = Pushbullet(access_token=self.stg_pbAccessToken,ping_timeout=2)
 
             # create device if it's the first run
             if not self.stg_pbClientIden:
@@ -218,7 +218,7 @@ class Service:
                 if data['item']['type'] == 'movie':
                     result = executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GetItem", "params": { "properties": ["title","year","tagline","thumbnail","file"], "playerid": ' + str(playerId) + ' }, "id": "1"}')
 
-                    if 'title' in result['item'] and result['item'] != '':
+                    if 'title' in result['item'] and result['item']['title'] != '':
                         title = '%s (%s)' % (result['item']['title'], result['item']['year'])
                         body = result['item']['tagline']
                     else:
@@ -228,7 +228,7 @@ class Service:
                 elif data['item']['type'] == 'song':
                     result = executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GetItem", "params": { "properties": ["title","album","artist","thumbnail","file"], "playerid": ' + str(playerId) + ' }, "id": "1"}')
 
-                    if 'title' in result['item'] and result['item'] != '':
+                    if 'title' in result['item'] and result['item']['title'] != '':
                         title = result['item']['title']
                         body = '%s / %s' % (result['item']['album'], ', '.join(result['item']['artist']))
                     else:
@@ -252,4 +252,21 @@ class Service:
                     log('Ephemeral push NOT send: %s - %s' % (ephemeralMsg['title'], ephemeralMsg['body']), xbmc.LOGERROR)
 
 if __name__ == "__main__":
-    Service()
+    import sys
+
+    if sys.argv[0] == 'service.pushbullet' and len(sys.argv) < 2:
+        import main
+        main.main()
+
+    try:
+        args = None
+        if len(sys.argv) > 1:
+            args = sys.argv[1:]
+
+        if args:
+            import main
+            main.handleArg(args[0])
+        else:
+            Service()
+    except:
+        traceError()

@@ -15,6 +15,7 @@
     <category label="30002">
         <setting id="pb_mirroring_out" label="30050" type="bool" default="true"/>
         <setting id="pb_mirroring_out_media_nfo" label="30051" type="bool" subsetting="true" enable="eq(-1,true)" default="true"/>
+        <setting label="30052" type="action" action="RunScript(service.pushbullet,SEND_EPHEMERAL_TEST)" />
     </category>
     <category label="30003">
         <setting id="pb_client_iden" label="30060" type="text" enable="false"/>

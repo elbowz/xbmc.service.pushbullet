@@ -77,6 +77,10 @@ msgctxt "#30051"
 msgid "Media info playback"
 msgstr ""
 
+msgctxt "#30052"
+msgid "Send a test notification"
+msgstr ""
+
 
 msgctxt "#30060"
 msgid "Iden"
@@ -98,4 +102,12 @@ msgstr ""
 
 msgctxt "#30101"
 msgid "Error"
+msgstr ""
+
+msgctxt "#30102"
+msgid "Kodi Mirroring test"
+msgstr ""
+
+msgctxt "#30103"
+msgid "Remember to make a donation :)"
 msgstr ""

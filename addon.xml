@@ -8,6 +8,9 @@
         <import addon="xbmc.python" version="2.1.0"/>
     </requires>
     <extension point="xbmc.service" library="service.py" start="login"/>
+    <extension point="xbmc.python.script" library="main.py">
+        <provides>executable</provides>
+    </extension>
     <extension point="xbmc.addon.metadata">
         <summary lang="en">Pushbullet Notification Client</summary>
         <description lang="en">A Pushbullet client that receive pushes and/or mirroring other devices.
