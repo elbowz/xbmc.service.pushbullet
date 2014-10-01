@@ -105,9 +105,9 @@ msgid "Error"
 msgstr ""
 
 msgctxt "#30102"
-msgid "Kodi Mirroring test"
+msgid "Kodi Pushbullet Add-on"
 msgstr ""
 
 msgctxt "#30103"
-msgid "Remember to make a donation :)"
+msgid "Remember to make a donation for this add-on :)"
 msgstr ""

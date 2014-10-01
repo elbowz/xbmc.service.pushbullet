@@ -10,10 +10,9 @@ For set the Pushbullet *access token* as well as in the addon settings, you can 
 *userdata/addon_data/service.pushbullet/settings.xml*
 
 ### Features (TODOS)
-- [ ] Auto dismiss notification on Android when playback finish (for Sync/Mirroring in outbound mode)
 - [ ] Send commands or JSONRPC to Kodi through Pushbullet notes
 - [ ] Answer messages directly on Kodi
-- [ ] Catch other Kodi notification to send to other device (for Sync/Mirroring in outbound mode)
+- [ ] Catch others Kodi notification to send to other device (for Sync/Mirroring in outbound mode)
 - [ ] Stop playback when notification are dismissed on Android
 
 ### www

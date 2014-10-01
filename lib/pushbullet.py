@@ -254,19 +254,18 @@ class Pushbullet():
         # init defautl data
         data.update({
             'type': 'mirror',
-            'package_name': 'com.pushbullet.android',
+            'package_name': 'com.xbmc.service.pushbullet',
             'notification_tag': None,
             'has_root': True,
-            'client_version': 125
+            'client_version': 126
         })
 
         # application_name != 'Pushbullet' => not viewed on Chrome Pushbullet extension
-        data['application_name'] = data['application_name'] if 'application_name' in data is not None else 'Pushbullet'
+        data['application_name'] = data['application_name'] if 'application_name' in data is not None else 'Pushbullet Kodi Add-on'
         data['dismissable'] = data['dismissable'] if 'dismissable' in data is not None else True
 
-        import sys
         import random
-        data['notification_id'] = str(data['notification_id']) if 'notification_id' in data is not None else str(random.randint(-sys.maxint-1, sys.maxint))
+        data['notification_id'] = data['notification_id'] if 'notification_id' in data is not None else random.randint(-300000000, 300000000)
 
         if self.user_iden is None:
             self.user_iden = self.getUserInfo(json_format_response=True)['iden']
@@ -275,6 +274,40 @@ class Pushbullet():
 
         if self.device_iden is None:
             raise Exception('You must define device_iden for send ephemeral')
+
+        data['source_device_iden'] = self.device_iden
+
+        data = {'type': 'push', 'push': data}
+
+        data = json.dumps(data)
+
+        self._response = self._h.request(self.base_url + self._REST_URLS['ephemerals'], method='POST', body=data,
+                                         headers={'Content-Type': 'application/json'})
+
+        return self._getResponse(json_format_response=json_format_response)
+
+    def dismissEphemeral(self, data, json_format_response=None):
+        """
+        Dismiss push called "ephemerals"
+        """
+
+        # init defautl data
+        data.update({
+            'type': 'dismissal',
+            'package_name': 'com.xbmc.service.pushbullet',
+            'notification_tag': None
+        })
+
+        if 'notification_id' not in data:
+            raise Exception('You must define notification_id for dismiss ephemeral')
+
+        if self.user_iden is None:
+            self.user_iden = self.getUserInfo(json_format_response=True)['iden']
+
+        data['source_user_iden'] = self.user_iden
+
+        if self.device_iden is None:
+            raise Exception('You must define device_iden for dismiss ephemeral')
 
         data['source_device_iden'] = self.device_iden
 

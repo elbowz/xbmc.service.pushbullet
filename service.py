@@ -199,12 +199,10 @@ class Service:
             raise Exception('No device found with iden: ' + self.stg_pbClientIden)
 
     # TODO: create a notification2Push class
-    import sys
     import random
-    notificationId = random.randint(-sys.maxint-1, sys.maxint)
+    notificationId = random.randint(-300000000, 300000000)
 
     def _onKodiNotification(self, sender, method, data):
-
 
         import json
         data = json.loads(data)
@@ -250,6 +248,16 @@ class Service:
                     log('Ephemeral push sended: %s - %s' % (ephemeralMsg['title'], ephemeralMsg['body']))
                 else:
                     log('Ephemeral push NOT send: %s - %s' % (ephemeralMsg['title'], ephemeralMsg['body']), xbmc.LOGERROR)
+
+            elif method == 'Player.OnStop' and self.stg_pbMirroringOutMediaNfo:
+                log('onKodiNotification: %s %s %s' % (sender, method, data))
+
+                ephemeralDimiss = {'notification_id': self.notificationId}
+
+                if len(self.pushbullet.dismissEphemeral(ephemeralDimiss)) == 0:
+                    log('Ephemeral dismiss send')
+                else:
+                    log('Ephemeral dismiss NOT send', xbmc.LOGERROR)
 
 if __name__ == "__main__":
     import sys

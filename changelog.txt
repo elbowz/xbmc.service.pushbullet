@@ -1,3 +1,6 @@
+[B]0.6.8b[/B]
+- Auto dismiss notification when playback finish (for Sync/Mirroring in outbound mode)
+
 [B]0.6.6b[/B]
 - Playback pushed link (youtube plugin supported)
 - Sync/Mirroring: Send notifications to others devices (outbound mode):
