@@ -15,8 +15,8 @@ class Push2Notification():
         self.imgFilePath = join(self.tempPath, 'temp-notification-icon')
 
         import re
-        self.re_youtubeMatchLink = re.compile('http://youtu\.be/(?P<id>[a-zA-Z0-9]+)', re.IGNORECASE)
-        self.re_youtubeMatch2Link = re.compile('https?://www\.youtube\.com/watch\?v=(?P<id>[a-zA-Z0-9]+)', re.IGNORECASE)
+        self.re_youtubeMatchLink = re.compile('http://youtu\.be/(?P<id>[a-zA-Z0-9_-]+)', re.IGNORECASE)
+        self.re_youtubeMatch2Link = re.compile('https?://www\.youtube\.com/watch\?v=(?P<id>[a-zA-Z0-9_-]+)', re.IGNORECASE)
 
     def onMessage(self, message):
         try:

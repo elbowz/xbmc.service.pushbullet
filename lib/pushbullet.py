@@ -105,7 +105,7 @@ class Pushbullet():
 
         # filter: for this device target (iden)
         if self.device_iden:
-            pushes = [push for push in pushes if ('target_device_iden' in push and push['target_device_iden'] == self.device_iden)]
+            pushes = [push for push in pushes if ('target_device_iden' not in push or ('target_device_iden' in push and push['target_device_iden'] == self.device_iden))]
 
         # filter: only not dismissed
         pushes = [push for push in pushes if ('dismissed' in push and push['dismissed'] is False)]
