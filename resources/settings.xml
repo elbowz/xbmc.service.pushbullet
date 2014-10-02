@@ -5,6 +5,7 @@
         <setting id="pb_access_token" label="30030" type="text"/>
         <setting label="30011" type="lsep"/>
         <setting id="notification_time" label="30031" type="slider" default="6" range="1,1,60" option="int" />
+        <setting id="pb_channels" label="30032" type="bool" default="true"/>
     </category>
     <category label="30001">
         <setting id="pb_mirroring" label="30040" type="bool" default="true"/>
@@ -16,6 +17,8 @@
         <setting id="pb_mirroring_out" label="30050" type="bool" default="true"/>
         <setting id="pb_mirroring_out_media_nfo" label="30051" type="bool" subsetting="true" enable="eq(-1,true)" default="true"/>
         <setting label="30052" type="action" action="RunScript(service.pushbullet,SEND_EPHEMERAL_TEST)" />
+        <setting label="30011" type="lsep"/>
+        <setting id="cmd_on_dismiss_push" label="30053" type="labelenum" values="Stop|Pause|Next|None" enable="eq(-3,true)"/>
     </category>
     <category label="30003">
         <setting id="pb_client_iden" label="30060" type="text" enable="false"/>

@@ -1,5 +1,9 @@
+[B]0.6.10b[/B]
+- 'View Channels' in add-on settings
+- Playback action (Stop, Pause or Next) when push is dismissed on device
+
 [B]0.6.8b[/B]
-- Auto dismiss notification when playback finish (for Sync/Mirroring in outbound mode)
+- Auto dismiss notification when playback end (for Sync/Mirroring in outbound mode)
 
 [B]0.6.6b[/B]
 - Playback pushed link (youtube plugin supported)

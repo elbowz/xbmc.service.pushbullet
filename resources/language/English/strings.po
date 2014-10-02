@@ -56,6 +56,10 @@ msgctxt "#30031"
 msgid "Hide notifications automatically after (seconds)"
 msgstr ""
 
+msgctxt "#30032"
+msgid "View Channels"
+msgstr ""
+
 
 msgctxt "#30040"
 msgid "View notifications of others devices"
@@ -79,6 +83,10 @@ msgstr ""
 
 msgctxt "#30052"
 msgid "Send a test notification"
+msgstr ""
+
+msgctxt "#30053"
+msgid "Playback action when push is dismissed on device"
 msgstr ""
 
 

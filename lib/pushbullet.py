@@ -9,7 +9,7 @@ class Pushbullet():
     """
 
     def __init__(self, access_token=None, user_iden=None, device_iden=None, filter_deny={}, filter_allow={},
-                 mirror_mode=True, base_url='https://api.pushbullet.com/v2/', ping_timeout=2,
+                 mirror_mode=True, view_channels = True, base_url='https://api.pushbullet.com/v2/', ping_timeout=2,
                  json_format_response=True):
         """
         access_token: access toke.
@@ -32,6 +32,7 @@ class Pushbullet():
         self.filter_deny = filter_deny
         self.filter_allow = filter_allow
         self.mirror_mode = mirror_mode
+        self.view_channels = view_channels
         self.base_url = base_url
         self.ping_timeout = ping_timeout
         self.json_format_response = json_format_response
@@ -106,6 +107,10 @@ class Pushbullet():
         # filter: for this device target (iden)
         if self.device_iden:
             pushes = [push for push in pushes if ('target_device_iden' not in push or ('target_device_iden' in push and push['target_device_iden'] == self.device_iden))]
+
+        # filter: not view channels
+        if not self.view_channels:
+            pushes = [push for push in pushes if ('channel_iden' not in push)]
 
         # filter: only not dismissed
         pushes = [push for push in pushes if ('dismissed' in push and push['dismissed'] is False)]
@@ -221,18 +226,23 @@ class Pushbullet():
         data = json.loads(message)
 
         # message type: mirror
-        if self.mirror_mode and data['type'] == 'push' and data['push']['type'] == 'mirror':
+        if self.mirror_mode and data['type'] == 'push':
             pushes = data['push']
 
             # remove/ignore pushes send by this client
             if self.device_iden is not None:
                 pushes = self.filter(pushes, filter_deny={'source_device_iden': [self.device_iden]})
 
-            # apply object/user filters
             if len(pushes):
-                pushes = self.filter(pushes, self.filter_deny, self.filter_allow)
+                if data['push']['type'] == 'mirror':
 
-                if len(pushes):
+                    # apply object/user filters
+                    pushes = self.filter(pushes, self.filter_deny, self.filter_allow)
+
+                    if len(pushes):
+                        self._user_on_message(pushes[0])
+
+                elif data['push']['type'] == 'dismissal':
                     self._user_on_message(pushes[0])
 
         # something has changed on the server /v2/pushes resources
@@ -349,6 +359,12 @@ class Pushbullet():
         Set mirror_mode
         """
         self.mirror_mode = mirror_mode
+
+    def setViewChannels(self, view_channels):
+        """
+        Set view_channels
+        """
+        self.view_channels = view_channels
 
     def close(self):
         """

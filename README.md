@@ -13,7 +13,6 @@ For set the Pushbullet *access token* as well as in the addon settings, you can 
 - [ ] Send commands or JSONRPC to Kodi through Pushbullet notes
 - [ ] Answer messages directly on Kodi
 - [ ] Catch others Kodi notification to send to other device (for Sync/Mirroring in outbound mode)
-- [ ] Stop playback when notification are dismissed on Android
 
 ### www
 * [Official Topic](http://forum.xbmc.org/showthread.php?tid=204567)

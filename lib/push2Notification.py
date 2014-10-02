@@ -6,10 +6,12 @@ class Push2Notification():
     Pushbullet push to Kodi Notification
     """
 
-    def __init__(self, notificationTime=6000, notificationIcon=None, tempPath=None):
+    def __init__(self, notificationTime=6000, notificationIcon=None, tempPath=None, pbPlaybackNotificationId=None, cmdOnDismissPush='stop'):
         self.notificationTime = notificationTime
         self.notificationIcon = notificationIcon
         self.tempPath = tempPath
+        self.pbPlaybackNotificationId = pbPlaybackNotificationId
+        self.cmdOnDismissPush = cmdOnDismissPush
 
         from os.path import join
         self.imgFilePath = join(self.tempPath, 'temp-notification-icon')
@@ -34,14 +36,19 @@ class Push2Notification():
                         body = None
 
                     showNotification(message["application_name"], body, self.notificationTime, iconPath)
-            else:
-                if message['type'] == 'link':
-                    self._onMessageLink(message)
-                elif message['type'] == 'note':
-                    title = message['title'] if 'title' in message else ''
-                    body = message['body'].replace("\n", " / ") if 'body' in message else ''
 
-                    showNotification(title, body, self.notificationTime, self.notificationIcon)
+            # kodi action (pause, stop, skip) on push dismiss (from devices)
+            elif message['type'] == 'dismissal':
+                self._onDismissPush(message, self.cmdOnDismissPush)
+
+            elif message['type'] == 'link':
+                self._onMessageLink(message)
+
+            elif message['type'] == 'note':
+                title = message['title'] if 'title' in message else ''
+                body = message['body'].replace("\n", " / ") if 'body' in message else ''
+
+                showNotification(title, body, self.notificationTime, self.notificationIcon)
 
         except Exception as ex:
             traceError()
@@ -58,6 +65,24 @@ class Push2Notification():
 
         playMedia(message['url'])
 
+    def _onDismissPush(self, message, cmd):
+        # TODO: add package_name, source_device_iden for be sure is the right dismission
+        """
+        {"notification_id": 1812, "package_name": "com.podkicker", "notification_tag": null,
+        "source_user_iden": "ujy9SIuzSFw", "source_device_iden": "ujy9SIuzSFwsjzWIEVDzOK", "type": "dismissal"}
+        """
+        if message['notification_id'] == self.pbPlaybackNotificationId:
+            log('Execute action on dismiss push: %s' % cmd)
+
+            playerId = executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1}')[0]['playerid']
+
+            if cmd == 'pause':
+                executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.PlayPause", "params": { "playerid":' + str(playerId) + '}, "id": 1}')
+            elif cmd == 'stop':
+                executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.Stop", "params": { "playerid":' + str(playerId) + '}, "id": 1}')
+            elif cmd == 'next':
+                executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GoTo", "params": { "playerid":' + str(playerId) + ', "to": "next"}, "id": 1}')
+
     def onError(self, error):
         log(error, xbmc.LOGERROR)
         showNotification(localise(30101), error, self.notificationTime, self.notificationIcon)
@@ -70,6 +95,12 @@ class Push2Notification():
 
     def setNotificationTime(self, notificationTime):
         self.notificationTime = notificationTime
+
+    def setPbPlaybackNotificationId(self, pbPlaybackNotificationId):
+        self.pbPlaybackNotificationId = pbPlaybackNotificationId
+
+    def setCmdOnDismissPush(self, cmdOnDismissPush):
+        self.cmdOnDismissPush = cmdOnDismissPush
 
 def playYoutubeVideo(id):
     log('Opening Youtube video (%s) plugin' % id)

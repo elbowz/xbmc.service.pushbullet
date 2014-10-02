@@ -40,8 +40,11 @@ class Service:
         self.serviceMonitor = serviceMonitor(onSettingsChangedAction=self._checkSettingChanged)
 
         # convert push to Kodi notification
+        import random
+        self.pbPlaybackNotificationId = random.randint(-300000000, 300000000)
+
         from lib.push2Notification import Push2Notification
-        self.push2Notification = Push2Notification(notificationIcon=__addonicon__, tempPath=__addonprofile__)
+        self.push2Notification = Push2Notification(notificationIcon=__addonicon__, tempPath=__addonprofile__, pbPlaybackNotificationId=self.pbPlaybackNotificationId)
 
         self._getSettings()
         self.run()
@@ -106,9 +109,11 @@ class Service:
         self.pushbullet.setFilterDeny({'application_name': self.stg_pbFilterDeny.split()})
         self.pushbullet.setFilterAllow({'application_name': self.stg_pbFilterAllow.split()})
         self.pushbullet.setMirrorMode(self.stg_pbMirroring)
+        self.pushbullet.setViewChannels(self.stg_pbChannels)
 
         # setup service
         self.push2Notification.setNotificationTime(self.stg_notificationTime*1000)
+        self.push2Notification.setCmdOnDismissPush(self.stg_cmdOnDismissPush.lower())
 
         # outbound mirroring
         if self.stg_pbMirroringOut:
@@ -138,11 +143,15 @@ class Service:
 
     def _isSettingChanged(self):
         if self.stg_notificationTime != int(__addon__.getSetting('notification_time')): return True
+        elif self.stg_pbChannels != (__addon__.getSetting('pb_channels') == 'true'): return True
         elif self.stg_pbMirroring != (__addon__.getSetting('pb_mirroring') == 'true'): return True
         elif self.stg_pbFilterDeny != __addon__.getSetting('pb_filter_deny'): return True
         elif self.stg_pbFilterAllow != __addon__.getSetting('pb_filter_allow'): return True
         elif self.stg_pbMirroringOut != (__addon__.getSetting('pb_mirroring_out') == 'true'): return True
         elif self.stg_pbMirroringOutMediaNfo != (__addon__.getSetting('pb_mirroring_out_media_nfo') == 'true'): return True
+        elif self.stg_cmdOnDismissPush != __addon__.getSetting('cmd_on_dismiss_push'): return True
+
+        # ignore read only settings (pb_client_iden, pb_client_nickname, pb_client_model)
 
         return False
 
@@ -151,6 +160,7 @@ class Service:
 
         self.stg_pbAccessToken          = __addon__.getSetting('pb_access_token')
         self.stg_notificationTime       = int(__addon__.getSetting('notification_time'))
+        self.stg_pbChannels             = __addon__.getSetting('pb_channels') == 'true'
 
         self.stg_pbMirroring            = __addon__.getSetting('pb_mirroring') == 'true'
         self.stg_pbFilterDeny           = __addon__.getSetting('pb_filter_deny')
@@ -158,6 +168,7 @@ class Service:
 
         self.stg_pbMirroringOut         = __addon__.getSetting('pb_mirroring_out') == 'true'
         self.stg_pbMirroringOutMediaNfo = __addon__.getSetting('pb_mirroring_out_media_nfo') == 'true'
+        self.stg_cmdOnDismissPush       = __addon__.getSetting('cmd_on_dismiss_push')
 
         # read only settings
         self.stg_pbClientIden           = __addon__.getSetting('pb_client_iden')
@@ -199,8 +210,6 @@ class Service:
             raise Exception('No device found with iden: ' + self.stg_pbClientIden)
 
     # TODO: create a notification2Push class
-    import random
-    notificationId = random.randint(-300000000, 300000000)
 
     def _onKodiNotification(self, sender, method, data):
 
@@ -242,7 +251,7 @@ class Service:
                 else:
                     icon = self.xbmcImgEncoded
 
-                ephemeralMsg = {'title': title, 'body': body, 'notification_id': self.notificationId, 'icon': icon}
+                ephemeralMsg = {'title': title, 'body': body, 'notification_id': self.pbPlaybackNotificationId, 'icon': icon}
 
                 if len(self.pushbullet.sendEphemeral(ephemeralMsg)) == 0:
                     log('Ephemeral push sended: %s - %s' % (ephemeralMsg['title'], ephemeralMsg['body']))
@@ -252,7 +261,7 @@ class Service:
             elif method == 'Player.OnStop' and self.stg_pbMirroringOutMediaNfo:
                 log('onKodiNotification: %s %s %s' % (sender, method, data))
 
-                ephemeralDimiss = {'notification_id': self.notificationId}
+                ephemeralDimiss = {'notification_id': self.pbPlaybackNotificationId}
 
                 if len(self.pushbullet.dismissEphemeral(ephemeralDimiss)) == 0:
                     log('Ephemeral dismiss send')
