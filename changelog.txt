@@ -1,16 +1,19 @@
-[B]0.6.10b[/B]
+0.6.12b
+- Manage pictures view and slideshow as song and movie playback (for Sync/Mirroring in outbound mode)
+
+0.6.10b
 - 'View Channels' in add-on settings
 - Playback action (Stop, Pause or Next) when push is dismissed on device
 
-[B]0.6.8b[/B]
+0.6.8b
 - Auto dismiss notification when playback end (for Sync/Mirroring in outbound mode)
 
-[B]0.6.6b[/B]
+0.6.6b
 - Playback pushed link (youtube plugin supported)
 - Sync/Mirroring: Send notifications to others devices (outbound mode):
 - Media info playback (song and movie info with their thumbs!)
 - Added to settings "Send a test notification" button
 - Added support for Pushbullet Channels
 
-[B]0.6.0b[/B]
+0.6.0b
 - Hello Pushbullet :)

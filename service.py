@@ -220,35 +220,41 @@ class Service:
             if method == 'Player.OnPlay' and self.stg_pbMirroringOutMediaNfo:
                 log('onKodiNotification: %s %s %s' % (sender, method, data))
 
+                title = body = icon = None
                 playerId = data['player']['playerid']
 
-                if data['item']['type'] == 'movie':
-                    result = executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GetItem", "params": { "properties": ["title","year","tagline","thumbnail","file"], "playerid": ' + str(playerId) + ' }, "id": "1"}')
+                result = executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GetItem", "params": { "properties": ["title","year","tagline","album","artist","thumbnail","file"], "playerid": ' + str(playerId) + ' }, "id": "1"}')
 
-                    if 'title' in result['item'] and result['item']['title'] != '':
-                        title = '%s (%s)' % (result['item']['title'], result['item']['year'])
-                        body = result['item']['tagline']
+                if 'item' in result:
+                    if data['item']['type'] == 'movie':
+                        if 'title' in result['item'] and result['item']['title'] != '':
+                            title = '%s (%s)' % (result['item']['title'], result['item']['year'])
+                            body = result['item']['tagline']
+
+                    elif data['item']['type'] == 'song':
+                        if 'title' in result['item'] and result['item']['title'] != '':
+                            title = result['item']['title']
+                            body = '%s / %s' % (result['item']['album'], ', '.join(result['item']['artist']))
+
+                    elif data['item']['type'] == 'picture':
+                        title = 'Picture'
+                        body = data['item']['file']
+
+                    # TODO: manage whole type:  "unknown", "episode", "musicvideo", "channel"
                     else:
                         title = result['item']['file']
                         body = None
 
-                elif data['item']['type'] == 'song':
-                    result = executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GetItem", "params": { "properties": ["title","album","artist","thumbnail","file"], "playerid": ' + str(playerId) + ' }, "id": "1"}')
+                    if 'thumbnail' in result['item']:
+                        thumbnailFilePath = result['item']['thumbnail']
+                        try:
+                            icon = fileTobase64(thumbnailFilePath, imgFormat='JPEG', imgSize=(72, 72))
+                        except:
+                            icon = self.xbmcImgEncoded
 
-                    if 'title' in result['item'] and result['item']['title'] != '':
-                        title = result['item']['title']
-                        body = '%s / %s' % (result['item']['album'], ', '.join(result['item']['artist']))
-                    else:
-                        title = result['item']['file']
-                        body = None
-
-                if 'thumbnail' in result['item']:
-                    thumbnailFilePath = result['item']['thumbnail']
-                    try:
-                        icon = fileTobase64(thumbnailFilePath, imgFormat='JPEG', imgSize=(80, 80))
-                    except:
-                        icon = self.xbmcImgEncoded
                 else:
+                    title = 'unknown'
+                    body = None
                     icon = self.xbmcImgEncoded
 
                 ephemeralMsg = {'title': title, 'body': body, 'notification_id': self.pbPlaybackNotificationId, 'icon': icon}

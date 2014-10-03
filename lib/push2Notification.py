@@ -30,8 +30,7 @@ class Push2Notification():
                     iconPath = base64ToFile(message['icon'], self.imgFilePath, imgFormat='JPEG', imgSize=(96, 96))
 
                     if 'body' in message:
-                        if message['body'].endswith('\n'): message['body'] = message['body'][:-1]
-                        body = message['body'].replace('\n', ' / ')
+                        body = message['body'].rstrip('\n').replace('\n', ' / ')
                     else:
                         body = None
 
@@ -74,14 +73,17 @@ class Push2Notification():
         if message['notification_id'] == self.pbPlaybackNotificationId:
             log('Execute action on dismiss push: %s' % cmd)
 
-            playerId = executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1}')[0]['playerid']
+            result = executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1}')
 
-            if cmd == 'pause':
-                executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.PlayPause", "params": { "playerid":' + str(playerId) + '}, "id": 1}')
-            elif cmd == 'stop':
-                executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.Stop", "params": { "playerid":' + str(playerId) + '}, "id": 1}')
-            elif cmd == 'next':
-                executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GoTo", "params": { "playerid":' + str(playerId) + ', "to": "next"}, "id": 1}')
+            if len(result) > 0:
+                playerId = result[0]['playerid']
+
+                if cmd == 'pause':
+                    executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.PlayPause", "params": { "playerid":' + str(playerId) + '}, "id": 1}')
+                elif cmd == 'stop':
+                    executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.Stop", "params": { "playerid":' + str(playerId) + '}, "id": 1}')
+                elif cmd == 'next':
+                    executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GoTo", "params": { "playerid":' + str(playerId) + ', "to": "next"}, "id": 1}')
 
     def onError(self, error):
         log(error, xbmc.LOGERROR)

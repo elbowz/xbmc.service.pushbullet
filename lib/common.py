@@ -29,7 +29,7 @@ def traceError():
 
 def showNotification(title, message, timeout=2000, icon=__addonicon__):
     xbmc.executebuiltin('Notification(%s,%s,%s,%s)' % (
-        str(title).encode('utf-8', 'ignore'), str(message).encode('utf-8', 'ignore'), timeout, icon))
+        title.encode('utf-8', 'ignore'), message.encode('utf-8', 'ignore'), timeout, icon))
 
 
 def executeJSONRPC(jsonStr):
