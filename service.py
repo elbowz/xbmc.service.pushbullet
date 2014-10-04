@@ -223,7 +223,7 @@ class Service:
                 title = body = icon = None
                 playerId = data['player']['playerid']
 
-                result = executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GetItem", "params": { "properties": ["title","year","tagline","album","artist","thumbnail","file"], "playerid": ' + str(playerId) + ' }, "id": "1"}')
+                result = executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GetItem", "params": { "properties": ["title","year","tagline","album","artist","plot","episode","season","showtitle","channel","channeltype","channelnumber","thumbnail","file"], "playerid": ' + str(playerId) + ' }, "id": "1"}')
 
                 if 'item' in result:
                     if data['item']['type'] == 'movie':
@@ -231,7 +231,7 @@ class Service:
                             title = '%s (%s)' % (result['item']['title'], result['item']['year'])
                             body = result['item']['tagline']
 
-                    elif data['item']['type'] == 'song':
+                    elif data['item']['type'] == 'song' or data['item']['type'] == 'musicvideo':
                         if 'title' in result['item'] and result['item']['title'] != '':
                             title = result['item']['title']
                             body = '%s / %s' % (result['item']['album'], ', '.join(result['item']['artist']))
@@ -240,9 +240,16 @@ class Service:
                         title = 'Picture'
                         body = data['item']['file']
 
-                    # TODO: manage whole type:  "unknown", "episode", "musicvideo", "channel"
+                    elif data['item']['type'] == 'episode':
+                        title = result['item']['title']
+                        body = '%s %sx%s' % (result['item']['showtitle'], result['item']['episode'], result['item']['season'])
+
+                    elif data['item']['type'] == 'channel':
+                        title = result['item']['title']
+                        body = '%s - %s (%s)' % (result['item']['channelnumber'], result['item']['channel'], result['item']['channeltype'], )
+
                     else:
-                        title = result['item']['file']
+                        title = result['item']['label'] if 'label' in result['item'] else result['item']['file']
                         body = None
 
                     if 'thumbnail' in result['item']:

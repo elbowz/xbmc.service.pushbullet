@@ -1,3 +1,7 @@
+0.6.14b
+- Added internal Kodi modules (script.module.httplib2 and script.module.six)
+- Manage new playback types: "episode", "musicvideo", "channel"
+
 0.6.12b
 - Manage pictures view and slideshow as song and movie playback (for Sync/Mirroring in outbound mode)
 
