@@ -119,3 +119,7 @@ msgstr ""
 msgctxt "#30103"
 msgid "Remember to make a donation for this add-on :)"
 msgstr ""
+
+msgctxt "#30104"
+msgid "'%s' kcmd executed"
+msgstr ""

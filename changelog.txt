@@ -1,4 +1,8 @@
+0.6.16b
+- Added custom kodi commands (aka kcmd)
+
 0.6.14b
+- First release added to the Official Kodi repository
 - Added internal Kodi modules (script.module.httplib2 and script.module.six)
 - Manage new playback types: "episode", "musicvideo", "channel"
 

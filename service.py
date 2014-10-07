@@ -31,6 +31,7 @@ class Service:
         # xbmc icon (used as ephemerals icon)
         import os
         xbmcImgPath = os.path.join(__addonpath__, 'resources', 'media', 'xbmc.jpg')
+        kodiCmdsNotificationIcon = os.path.join(__addonpath__, 'resources', 'media', 'kcmd.png')
 
         import base64
         with open(xbmcImgPath, "rb") as imgFile:
@@ -44,7 +45,10 @@ class Service:
         self.pbPlaybackNotificationId = random.randint(-300000000, 300000000)
 
         from lib.push2Notification import Push2Notification
-        self.push2Notification = Push2Notification(notificationIcon=__addonicon__, tempPath=__addonprofile__, pbPlaybackNotificationId=self.pbPlaybackNotificationId)
+        self.push2Notification = Push2Notification(notificationIcon=__addonicon__, tempPath=__addonprofile__,
+                                                   pbPlaybackNotificationId=self.pbPlaybackNotificationId,
+                                                   kodiCmds=getKodiCmdsFromFiles(),
+                                                   kodiCmdsNotificationIcon=kodiCmdsNotificationIcon)
 
         self._getSettings()
         self.run()

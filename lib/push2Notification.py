@@ -6,17 +6,23 @@ class Push2Notification():
     Pushbullet push to Kodi Notification
     """
 
-    def __init__(self, notificationTime=6000, notificationIcon=None, tempPath=None, pbPlaybackNotificationId=None, cmdOnDismissPush='stop'):
+    def __init__(self, notificationTime=6000, notificationIcon=None, tempPath=None, pbPlaybackNotificationId=None, cmdOnDismissPush='stop', kodiCmds=None, kodiCmdsNotificationIcon=None):
         self.notificationTime = notificationTime
         self.notificationIcon = notificationIcon
         self.tempPath = tempPath
         self.pbPlaybackNotificationId = pbPlaybackNotificationId
         self.cmdOnDismissPush = cmdOnDismissPush
+        self.kodiCmds = kodiCmds
+        self.kodiCmdsNotificationIcon = kodiCmdsNotificationIcon
 
         from os.path import join
         self.imgFilePath = join(self.tempPath, 'temp-notification-icon')
 
         import re
+        self.re_kodiCmd= re.compile('kcmd::(?P<cmd>[a-zA-Z0-9_.-]+)')
+        self.re_kodiCmdPlaceholder = re.compile('<\$([a-zA-Z0-9_\[\]]+)>')
+
+
         self.re_youtubeMatchLink = re.compile('http://youtu\.be/(?P<id>[a-zA-Z0-9_-]+)', re.IGNORECASE)
         self.re_youtubeMatch2Link = re.compile('https?://www\.youtube\.com/watch\?v=(?P<id>[a-zA-Z0-9_-]+)', re.IGNORECASE)
 
@@ -44,10 +50,11 @@ class Push2Notification():
                 self._onMessageLink(message)
 
             elif message['type'] == 'note':
-                title = message['title'] if 'title' in message else ''
-                body = message['body'].replace("\n", " / ") if 'body' in message else ''
+                if not self.executeKodiCmd(message):
+                    title = message['title'] if 'title' in message else ''
+                    body = message['body'].replace("\n", " / ") if 'body' in message else ''
 
-                showNotification(title, body, self.notificationTime, self.notificationIcon)
+                    showNotification(title, body, self.notificationTime, self.notificationIcon)
 
         except Exception as ex:
             traceError()
@@ -94,6 +101,57 @@ class Push2Notification():
 
     def onOpen(self):
         log('Socket opened')
+
+    def executeKodiCmd(self, message):
+        if self.kodiCmds and 'title' in message:
+            match = self.re_kodiCmd.match(message['title'])
+
+            if match:
+                cmd = match.group('cmd')
+
+                if cmd in self.kodiCmds:
+                    try:
+                        cmdObj = self.kodiCmds[cmd]
+                        jsonrpc = cmdObj['JSONRPC']
+
+                        if 'body' in message and len(message['body']) > 0:
+                            params = message['body'].split('||')
+
+                            # escape bracket '{}' => '{{}}'
+                            jsonrpc = jsonrpc.replace('{', '{{').replace('}', '}}')
+                            # sobstitute custom placeholder '<$var>' => '{var}'
+                            jsonrpc = self.re_kodiCmdPlaceholder.sub('{\\1}', jsonrpc)
+                            # format with passed params
+                            jsonrpc = jsonrpc.format(params=params)
+
+                        log('Executing cmd "%s": %s' % (cmd, jsonrpc))
+
+                        result = executeJSONRPC(jsonrpc)
+
+                        log('Result for cmd "%s": %s' % (cmd, result))
+
+                        title = localise(30104) % cmd
+                        body = ''
+
+                        if 'notification' in cmdObj:
+                            # same transformation as jsonrpc var
+                            body = cmdObj['notification'].replace('{', '{{').replace('}', '}}')
+                            body = self.re_kodiCmdPlaceholder.sub('{\\1}', body)
+                            body = body.format(result=result)
+
+                    except Exception as ex:
+                        title = 'ERROR: ' + localise(30104) % cmd
+                        body = ' '.join(str(arg) for arg in ex.args)
+                        log(body, xbmc.LOGERROR)
+                        traceError()
+
+                    showNotification(title, body, self.notificationTime, self.kodiCmdsNotificationIcon)
+                    return True
+
+                else:
+                    log('No "%s" cmd founded!' % cmd, xbmc.LOGERROR)
+
+        return False
 
     def setNotificationTime(self, notificationTime):
         self.notificationTime = notificationTime

@@ -29,7 +29,7 @@ def traceError():
 
 def showNotification(title, message, timeout=2000, icon=__addonicon__):
     xbmc.executebuiltin('Notification(%s,%s,%s,%s)' % (
-        title.encode('utf-8', 'ignore'), message.encode('utf-8', 'ignore'), timeout, icon))
+        title.encode('ascii', 'ignore'), message.encode('ascii', 'ignore'), timeout, icon))
 
 
 def executeJSONRPC(jsonStr):
@@ -44,6 +44,42 @@ def executeJSONRPC(jsonStr):
 def getMainSetting(name):
     result = executeJSONRPC('{ "jsonrpc": "2.0", "method": "Settings.GetSettingValue", "params": {"setting": "' + str(name) + '"}, "id": 1 }')
     return result['value']
+
+
+def getKodiCmdsFromFiles():
+    import os
+    internalKodiCmdsFile = os.path.join(__addonpath__, 'resources', 'kcmds.json')
+
+    file = open(internalKodiCmdsFile, 'r')
+    jsonKodiCmds = file.read()
+    file.close()
+
+    import json
+    jsonKodiCmds = json.loads(jsonKodiCmds)
+
+    try:
+        externalKodiCmdsFile = os.path.join(__addonprofile__, 'kcmds.json')
+
+        file = open(externalKodiCmdsFile, 'r')
+        externalJsonKodiCmds = file.read()
+        file.close()
+
+        externalJsonKodiCmds = json.loads(externalJsonKodiCmds)
+        jsonKodiCmds.update(externalJsonKodiCmds)
+
+    except IOError:
+        log('No user Kody commands defined. (Create %s for that)' % externalKodiCmdsFile, xbmc.LOGWARNING)
+
+    except Exception as ex:
+        traceError()
+        message = ' '.join(str(arg) for arg in ex.args)
+
+        log(message, xbmc.LOGERROR)
+
+    else:
+        log('Loaded user Kody commands: %s' % externalJsonKodiCmds.keys())
+
+    return jsonKodiCmds
 
 
 def base64ToFile(strBase64, filePath, imgFormat='JPEG', imgSize=None):
