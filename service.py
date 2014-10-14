@@ -117,6 +117,7 @@ class Service:
 
         # setup service
         self.push2Notification.setNotificationTime(self.stg_notificationTime*1000)
+        showNotification.proportionalTextLengthTimeout = self.stg_propotificationTime
         self.push2Notification.setCmdOnDismissPush(self.stg_cmdOnDismissPush.lower())
 
         # outbound mirroring
@@ -147,6 +148,7 @@ class Service:
 
     def _isSettingChanged(self):
         if self.stg_notificationTime != int(__addon__.getSetting('notification_time')): return True
+        elif self.stg_propotificationTime != (__addon__.getSetting('proportional_notification_time') == 'true'): return True
         elif self.stg_pbChannels != (__addon__.getSetting('pb_channels') == 'true'): return True
         elif self.stg_pbMirroring != (__addon__.getSetting('pb_mirroring') == 'true'): return True
         elif self.stg_pbFilterDeny != __addon__.getSetting('pb_filter_deny'): return True
@@ -164,6 +166,7 @@ class Service:
 
         self.stg_pbAccessToken          = __addon__.getSetting('pb_access_token')
         self.stg_notificationTime       = int(__addon__.getSetting('notification_time'))
+        self.stg_propotificationTime    = __addon__.getSetting('proportional_notification_time') == 'true'
         self.stg_pbChannels             = __addon__.getSetting('pb_channels') == 'true'
 
         self.stg_pbMirroring            = __addon__.getSetting('pb_mirroring') == 'true'

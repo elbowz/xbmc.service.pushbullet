@@ -4,8 +4,9 @@
         <setting label="30010" type="lsep"/>
         <setting id="pb_access_token" label="30030" type="text"/>
         <setting label="30011" type="lsep"/>
-        <setting id="notification_time" label="30031" type="slider" default="6" range="1,1,60" option="int" />
-        <setting id="pb_channels" label="30032" type="bool" default="true"/>
+        <setting id="notification_time" label="30031" type="slider" default="6" range="1,1,60" option="int" enable="eq(1,false)"/>
+        <setting id="proportional_notification_time" label="30032" type="bool" default="true"/>
+        <setting id="pb_channels" label="30033" type="bool" default="true"/>
     </category>
     <category label="30001">
         <setting id="pb_mirroring" label="30040" type="bool" default="true"/>

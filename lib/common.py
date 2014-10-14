@@ -28,8 +28,15 @@ def traceError():
     xbmc.log(traceback.format_exc(), level=xbmc.LOGERROR)
 
 def showNotification(title, message, timeout=2000, icon=__addonicon__):
-    xbmc.executebuiltin('Notification(%s,%s,%s,%s)' % (
+    if showNotification.proportionalTextLengthTimeout:
+        timeout = len(message)/10*2000
+
+    title = title.replace('"', '\\"')
+    message = message.replace('"', '\\"')
+
+    xbmc.executebuiltin('Notification("%s","%s","%s","%s"s)' % (
         title.encode('ascii', 'ignore'), message.encode('ascii', 'ignore'), timeout, icon))
+showNotification.proportionalTextLengthTimeout = False
 
 
 def executeJSONRPC(jsonStr):

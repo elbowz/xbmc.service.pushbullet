@@ -57,6 +57,10 @@ msgid "Hide notifications automatically after (seconds)"
 msgstr ""
 
 msgctxt "#30032"
+msgid "Proportional notifications timeout"
+msgstr ""
+
+msgctxt "#30033"
 msgid "View Channels"
 msgstr ""
 
