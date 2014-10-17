@@ -1,5 +1,6 @@
 import xbmc
 from lib.common import *
+from lib import pushhandler
 
 class Push2Notification():
     """
@@ -49,27 +50,55 @@ class Push2Notification():
             elif message['type'] == 'link':
                 self._onMessageLink(message)
 
-            elif message['type'] == 'note':
-                if not self.executeKodiCmd(message):
-                    title = message['title'] if 'title' in message else ''
-                    body = message['body'].replace("\n", " / ") if 'body' in message else ''
+            elif message['type'] == 'file':
+                self._onMessageFile(message)
 
-                    showNotification(title, body, self.notificationTime, self.notificationIcon)
+            elif message['type'] == 'note':
+                self._onMessageNote(message)
+
+            elif message['type'] == 'address':
+                self._onMessageAddress(message)
+
+            elif message['type'] == 'list':
+                self._onMessageList(message)
+
 
         except Exception as ex:
             traceError()
             log(' '.join(str(arg) for arg in ex.args), xbmc.LOGERROR)
 
     def _onMessageLink(self, message):
-        match = self.re_youtubeMatchLink.search(message['url'])
-        if match:
-            return playYoutubeVideo(match.group('id'))
+        mediaType = pushhandler.canHandle(message)
+        if not mediaType: return
+        self.handleMediaPush(mediaType,message)
+    
+    def _onMessageFile(self, message):
+        mediaType = pushhandler.canHandle(message)
+        if not mediaType: return
+        self.handleMediaPush(mediaType,message)
 
-        match = self.re_youtubeMatch2Link.search(message['url'])
-        if match:
-            return playYoutubeVideo(match.group('id'))
+    def _onMessageNote(self, message):
+        if not self.executeKodiCmd(message):
+            # Show instantly if enabled
+            if getSetting('handling_note',0) == 0 and pushhandler.canHandle(message):
+                pushhandler.handlePush(message)
+            # else show notification if enabled
+            elif getSetting('handling_note',0) == 1:
+                self.showNotificationFromMessage(message)
 
-        playMedia(message['url'])
+    def _onMessageAddress(self, message):
+        # Show instantly if enabled
+        if getSetting('handling_address',0) == 0 and pushhandler.canHandle(message):
+            pushhandler.handlePush(message)
+        elif getSetting('handling_address',0) == 1:
+            self.showNotificationFromMessage(message)
+
+    def _onMessageList(self, message):
+        # Show instantly if enabled
+        if getSetting('handling_list',0) == 0 and pushhandler.canHandle(message):
+            pushhandler.handlePush(message)
+        elif getSetting('handling_list',0) == 1:
+            self.showNotificationFromMessage(message)
 
     def _onDismissPush(self, message, cmd):
         # TODO: add package_name, source_device_iden for be sure is the right dismission
@@ -101,6 +130,25 @@ class Push2Notification():
 
     def onOpen(self):
         log('Socket opened')
+
+    def showNotificationFromMessage(self,message):
+        title = message.get('title',message.get('name',message.get('file_name',''))) or message.get('url','').rsplit('/',1)[-1]
+        body = message.get('body',message.get('address','')).replace("\n", " / ")
+        if not body and message['type'] == 'list':
+            body = '{0} items'.format(len(message.get('items',[])))
+
+        showNotification(title, body, self.notificationTime, self.notificationIcon)
+
+    def handleMediaPush(self, media_type, message):
+        # Check if instant play is enabled for the media type and play
+        if not media_type in ('video','audio','image'): return False
+        if getSetting('handling_{0}'.format(media_type),0) == 0:
+            pushhandler.handlePush(message)
+            return True
+        elif getSetting('handling_{0}'.format(media_type),0) == 1:
+            self.showNotificationFromMessage(message)
+
+        return False
 
     def executeKodiCmd(self, message):
         if self.kodiCmds and 'title' in message:
@@ -161,15 +209,3 @@ class Push2Notification():
 
     def setCmdOnDismissPush(self, cmdOnDismissPush):
         self.cmdOnDismissPush = cmdOnDismissPush
-
-def playYoutubeVideo(id):
-    log('Opening Youtube video (%s) plugin' % id)
-
-    playMedia('plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid=' + str(id))
-
-def playMedia(url):
-    log('Play media: ' + url)
-
-    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Playlist.Clear","params":{"playlistid":1}}')
-    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Playlist.Add","params":{"playlistid":1,"item":{"file":"' + str(url) + '"}}}')
-    return xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Player.Open","params":{"item":{"playlistid":1,"position":0}}}')
