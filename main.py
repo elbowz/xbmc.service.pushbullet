@@ -3,6 +3,7 @@ from lib import util
 
 __addon__        = lib.common.__addon__
 __addonpath__    = lib.common.__addonpath__
+__addonid__      = lib.common.__addonid__
 
 from lib.common import *
 
