@@ -207,8 +207,6 @@ class Pushbullet():
         self._ws_thread.start()
 
     def _websocketThread(self):
-        import websocket
-
         websocket.enableTrace(False)
         self._ws = websocket.WebSocketApp(self._REST_URLS['websocket'] + self.access_token,
                                           on_open=self._on_open,

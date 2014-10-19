@@ -1,5 +1,6 @@
 import xbmc
 import xbmcaddon
+from util import * #TODO: Move util funtions to here
 
 __addon__        = xbmcaddon.Addon()
 __addonid__      = __addon__.getAddonInfo('id')
@@ -34,7 +35,7 @@ def showNotification(title, message, timeout=2000, icon=__addonicon__):
     title = title.replace('"', '\\"')
     message = message.replace('"', '\\"')
 
-    xbmc.executebuiltin('Notification("%s","%s","%s","%s"s)' % (
+    xbmc.executebuiltin('Notification("%s","%s","%s","%s")' % (
         title.encode('ascii', 'ignore'), message.encode('ascii', 'ignore'), timeout, icon))
 showNotification.proportionalTextLengthTimeout = False
 
