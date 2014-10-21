@@ -64,6 +64,7 @@ def handlePush(data,from_gui=False):
             return True
         media = getURLMediaType(url)
         if media == 'video' or media == 'audio':
+            url += '|' + urllib.urlencode({'User-Agent':'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0 (Chrome)'})
             playMedia(url)
             return True
         elif media == 'image':
@@ -117,11 +118,12 @@ def handleURL(url):
 
 def playMedia(url,title='',thumb='',description=''):
     common.log('Play media: ' + url)
-
+   
     li = xbmcgui.ListItem(label=title,label2=description,iconImage=thumb,thumbnailImage=thumb)
     li.setPath(url)
     li.setInfo('video',{'title':title,'tagline':description})
     pl = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+    pl.clear()
     pl.add(url,li)
     xbmc.Player().play(pl)
 
