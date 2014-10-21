@@ -1,3 +1,6 @@
+0.8.4b
+- Fix for pushes playing last video unstead of pushed video
+
 0.8.2b
 - Fix for error preventing authorization
 
