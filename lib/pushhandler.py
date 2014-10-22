@@ -64,7 +64,7 @@ def handlePush(data,from_gui=False):
             return True
         media = getURLMediaType(url)
         if media == 'video' or media == 'audio':
-            url += '|' + urllib.urlencode({'User-Agent':'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0 (Chrome)'})
+            url += '|' + urllib.urlencode({'User-Agent':getURLUserAgent(url)})
             playMedia(url,playlist_type='video' and xbmc.PLAYLIST_VIDEO or xbmc.PLAYLIST_MUSIC)
             return True
         elif media == 'image':
@@ -115,6 +115,11 @@ def handleURL(url):
     if protocol in protocolURLs:
         pluginURL = protocolURLs[protocol].format(url=url)
         playMedia(pluginURL)
+
+def getURLUserAgent(url):
+    if url.lower().endswith('.mov'): #TODO: perhaps do a regex instead in case of params after file name, and perhaps only if apple.com
+        return 'QuickTime compatible (Kodi)'
+    return  'Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0 (Chrome)'
 
 def playMedia(url,title='',thumb='',description='',playlist_type=xbmc.PLAYLIST_VIDEO):
     common.log('Play media: ' + url)
