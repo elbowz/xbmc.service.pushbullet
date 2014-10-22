@@ -10,7 +10,7 @@ class Pushbullet():
 
     def __init__(self, access_token=None, user_iden=None, device_iden=None, filter_deny={}, filter_allow={},
                  mirror_mode=True, view_channels = True, base_url='https://api.pushbullet.com/v2/', ping_timeout=2,
-                 json_format_response=True):
+                 json_format_response=True, last_modified=0, last_modified_callback=None):
         """
         access_token: access toke.
         user_iden; used for send and receive ephemerals (if not set receive all pushes)
@@ -52,7 +52,9 @@ class Pushbullet():
         self._ws = None
         self._ws_thread = None
         self._response = None
-        self._last_modified = 0
+        
+        self._last_modified = last_modified
+        self._last_modified_callback = last_modified_callback
 
         self._user_on_open = None
         self._user_on_message = None
@@ -118,6 +120,7 @@ class Pushbullet():
         if len(pushes):
             # save modified time for next query on pushes
             self._last_modified = pushes[0]['modified']
+            if self._last_modified_callback: self._last_modified_callback(self._last_modified)
 
             # pushes dismiss
             for push in pushes:
