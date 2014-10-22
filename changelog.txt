@@ -1,3 +1,6 @@
+0.8.6b
+- Fix for .mov files from apple.com not playing
+
 0.8.4b
 - Fix for pushes playing last video unstead of pushed video
 
