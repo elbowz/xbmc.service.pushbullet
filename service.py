@@ -78,7 +78,11 @@ class Service:
             from lib.pushbullet import Pushbullet
 
             # init pushbullet
-            self.pushbullet = Pushbullet(access_token=self.stg_pbAccessToken,ping_timeout=2,last_modified=self.getLastModified(),last_modified_callback=self.setLastModified)
+            self.pushbullet = Pushbullet(   access_token=self.stg_pbAccessToken,
+                                            ping_timeout=2,
+                                            last_modified=getSetting('last_modified',0),
+                                            last_modified_callback=self.setLastModified
+            )
 
             # get device info (also if edited by user on Pushbullet panel)
             self._getDevice()
@@ -100,20 +104,6 @@ class Service:
 
             log(message, xbmc.LOGERROR)
             showNotification(localise(30101), message, self.serviceNotifcationTime)
-
-    def getLastModified(self):
-        modified = getSetting('last_modified',0) # Load the most recent modified time of previous received pushes
-        if not modified: # If we don't have a time saved...
-            # get a push list to find the most recent modified time
-            try:
-                from lib import pbclient
-                pushes = pbclient.Client(getSetting('pb_access_token')).pushes()
-                if not pushes: return
-                modified = pushes[0].get('modified',0)
-                self.setLastModified(modified)
-            except:
-                traceError()
-        return modified
 
     def setLastModified(self,modified):
         setSetting('last_modified','{0:10f}'.format(modified))

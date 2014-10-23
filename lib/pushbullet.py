@@ -3,6 +3,8 @@ import json
 import httplib2
 import websocket
 
+from common import traceError
+
 class Pushbullet():
     """
     Higher level of Pushbullet APIs are provided.
@@ -53,13 +55,25 @@ class Pushbullet():
         self._ws_thread = None
         self._response = None
         
-        self._last_modified = last_modified
         self._last_modified_callback = last_modified_callback
+        self.initLastModified(last_modified)
 
         self._user_on_open = None
         self._user_on_message = None
         self._user_on_close = None
         self._user_on_error = None
+
+    def initLastModified(self,last_modified):
+        self._last_modified = last_modified
+        if not self._last_modified: # If we don't have a time...
+            # get a push list to find the most recent modified time
+            try:
+                pushes = self.getPushes()
+                if not pushes: return
+                self._last_modified = pushes[0].get('modified',0)
+                if self._last_modified_callback: self._last_modified_callback(self._last_modified)
+            except:
+                traceError()
 
     def getUserInfo(self, json_format_response=None):
         """
