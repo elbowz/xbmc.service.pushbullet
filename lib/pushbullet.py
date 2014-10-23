@@ -9,7 +9,7 @@ class Pushbullet():
     """
 
     def __init__(self, access_token=None, user_iden=None, device_iden=None, filter_deny={}, filter_allow={},
-                 mirror_mode=True, view_channels = True, base_url='https://api.pushbullet.com/v2/', ping_timeout=2,
+                 mirror_mode=True, view_channels = True, base_url='https://api.pushbullet.com/v2/', ping_timeout=6,
                  json_format_response=True):
         """
         access_token: access toke.
@@ -215,7 +215,7 @@ class Pushbullet():
                                           on_error=self._on_error)
 
         # ping_timeout is for no blocking call
-        self._ws.run_forever(ping_timeout=self.ping_timeout)
+        self._ws.run_forever(ping_interval=6, ping_timeout=self.ping_timeout)
 
     def _on_open(self, websocket):
         self._user_on_open()
@@ -259,7 +259,7 @@ class Pushbullet():
         Send arbitrary JSON messages, called "ephemerals", to all devices on your account.
         """
 
-        # init defautl data
+        # init default data
         data.update({
             'type': 'mirror',
             'package_name': 'com.xbmc.service.pushbullet',

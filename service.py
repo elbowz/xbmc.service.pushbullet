@@ -78,7 +78,7 @@ class Service:
             from lib.pushbullet import Pushbullet
 
             # init pushbullet
-            self.pushbullet = Pushbullet(access_token=self.stg_pbAccessToken,ping_timeout=2)
+            self.pushbullet = Pushbullet(access_token=self.stg_pbAccessToken,ping_timeout=6)
 
             # get device info (also if edited by user on Pushbullet panel)
             self._getDevice()
