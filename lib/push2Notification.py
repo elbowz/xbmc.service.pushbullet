@@ -45,22 +45,22 @@ class Push2Notification():
 
             # kodi action (pause, stop, skip) on push dismiss (from devices)
             elif message['type'] == 'dismissal':
-                self._onDismissPush(message, self.cmdOnDismissPush)
+                return self._onDismissPush(message, self.cmdOnDismissPush)
 
             elif message['type'] == 'link':
-                self._onMessageLink(message)
+                return self._onMessageLink(message)
 
             elif message['type'] == 'file':
-                self._onMessageFile(message)
+                return self._onMessageFile(message)
 
             elif message['type'] == 'note':
-                self._onMessageNote(message)
+                return self._onMessageNote(message)
 
             elif message['type'] == 'address':
-                self._onMessageAddress(message)
+                return self._onMessageAddress(message)
 
             elif message['type'] == 'list':
-                self._onMessageList(message)
+                return self._onMessageList(message)
 
 
         except Exception as ex:
@@ -69,13 +69,13 @@ class Push2Notification():
 
     def _onMessageLink(self, message):
         mediaType = pushhandler.canHandle(message)
-        if not mediaType: return
-        self.handleMediaPush(mediaType,message)
+        if not mediaType: return False
+        return self.handleMediaPush(mediaType,message)
     
     def _onMessageFile(self, message):
         mediaType = pushhandler.canHandle(message)
-        if not mediaType: return
-        self.handleMediaPush(mediaType,message)
+        if not mediaType: return False
+        return self.handleMediaPush(mediaType,message)
 
     def _onMessageNote(self, message):
         if not self.executeKodiCmd(message):
@@ -85,6 +85,9 @@ class Push2Notification():
             # else show notification if enabled
             elif getSetting('handling_note',0) == 1:
                 self.showNotificationFromMessage(message)
+            else:
+                return False
+        return True
 
     def _onMessageAddress(self, message):
         # Show instantly if enabled
@@ -92,6 +95,9 @@ class Push2Notification():
             pushhandler.handlePush(message)
         elif getSetting('handling_address',0) == 1:
             self.showNotificationFromMessage(message)
+        else:
+            return False
+        return True
 
     def _onMessageList(self, message):
         # Show instantly if enabled
@@ -99,6 +105,9 @@ class Push2Notification():
             pushhandler.handlePush(message)
         elif getSetting('handling_list',0) == 1:
             self.showNotificationFromMessage(message)
+        else:
+            return False
+        return True
 
     def _onDismissPush(self, message, cmd):
         # TODO: add package_name, source_device_iden for be sure is the right dismission
@@ -141,13 +150,15 @@ class Push2Notification():
 
     def handleMediaPush(self, media_type, message):
         # Check if instant play is enabled for the media type and play
-        if not media_type in ('video','audio','image'): return False
-        if getSetting('handling_{0}'.format(media_type),0) == 0:
-            pushhandler.handlePush(message)
-            return True
-        elif getSetting('handling_{0}'.format(media_type),0) == 1:
-            self.showNotificationFromMessage(message)
+        if media_type in ('video','audio','image'):
+            if getSetting('handling_{0}'.format(media_type),0) == 0:
+                if not pushhandler.mediaPlaying() or getSetting('interrupt_media',False):
+                    pushhandler.handlePush(message)
+                    return True
 
+        if getSetting('handling_{0}'.format(media_type),0) == 1:
+            self.showNotificationFromMessage(message)
+            return True
         return False
 
     def executeKodiCmd(self, message):

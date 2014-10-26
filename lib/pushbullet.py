@@ -119,10 +119,6 @@ class Pushbullet():
             # save modified time for next query on pushes
             self._last_modified = pushes[0]['modified']
 
-            # pushes dismiss
-            for push in pushes:
-                self.dismissPush(push['iden'])
-
         return pushes
 
     def filter(self, pushes, filter_deny={}, filter_allow={}):
@@ -246,7 +242,9 @@ class Pushbullet():
         # something has changed on the server /v2/pushes resources
         elif data['type'] == 'tickle' and data['subtype'] == 'push':
             for push in self.getPushes():
-                self._user_on_message(push)
+                if push['modified'] > self._last_modified:
+                    if self._user_on_message(push):
+                        self.dismissPush(push['iden'])
 
     def _on_close(self, websocket):
         self._user_on_close()
