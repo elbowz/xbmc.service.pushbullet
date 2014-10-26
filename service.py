@@ -78,7 +78,11 @@ class Service:
             from lib.pushbullet import Pushbullet
 
             # init pushbullet
-            self.pushbullet = Pushbullet(access_token=self.stg_pbAccessToken,ping_timeout=6)
+            self.pushbullet = Pushbullet(   access_token=self.stg_pbAccessToken,
+                                            ping_timeout=2,
+                                            last_modified=getSetting('last_modified',0),
+                                            last_modified_callback=self.setLastModified
+            )
 
             # get device info (also if edited by user on Pushbullet panel)
             self._getDevice()
@@ -100,6 +104,10 @@ class Service:
 
             log(message, xbmc.LOGERROR)
             showNotification(localise(30101), message, self.serviceNotifcationTime)
+
+    def setLastModified(self,modified):
+        setSetting('last_modified','{0:10f}'.format(modified))
+        log('Updating last_modified: {0}'.format(modified))
 
     def _setupService(self):
         log('Setup Service and Pushbullet Client')

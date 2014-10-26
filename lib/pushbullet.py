@@ -3,14 +3,16 @@ import json
 import httplib2
 import websocket
 
+from common import traceError
+
 class Pushbullet():
     """
     Higher level of Pushbullet APIs are provided.
     """
 
     def __init__(self, access_token=None, user_iden=None, device_iden=None, filter_deny={}, filter_allow={},
-                 mirror_mode=True, view_channels = True, base_url='https://api.pushbullet.com/v2/', ping_timeout=6,
-                 json_format_response=True):
+                 mirror_mode=True, view_channels = True, base_url='https://api.pushbullet.com/v2/', ping_timeout=2,
+                 json_format_response=True, last_modified=0, last_modified_callback=None):
         """
         access_token: access toke.
         user_iden; used for send and receive ephemerals (if not set receive all pushes)
@@ -52,12 +54,26 @@ class Pushbullet():
         self._ws = None
         self._ws_thread = None
         self._response = None
-        self._last_modified = 0
+        
+        self._last_modified_callback = last_modified_callback
+        self.initLastModified(last_modified)
 
         self._user_on_open = None
         self._user_on_message = None
         self._user_on_close = None
         self._user_on_error = None
+
+    def initLastModified(self,last_modified):
+        self._last_modified = last_modified
+        if not self._last_modified: # If we don't have a time...
+            # get a push list to find the most recent modified time
+            try:
+                pushes = self.getPushes()
+                if not pushes: return
+                self._last_modified = pushes[0].get('modified',0)
+                if self._last_modified_callback: self._last_modified_callback(self._last_modified)
+            except:
+                traceError()
 
     def getUserInfo(self, json_format_response=None):
         """
@@ -118,6 +134,7 @@ class Pushbullet():
         if len(pushes):
             # save modified time for next query on pushes
             self._last_modified = pushes[0]['modified']
+            if self._last_modified_callback: self._last_modified_callback(self._last_modified)
 
         return pushes
 
@@ -211,7 +228,7 @@ class Pushbullet():
                                           on_error=self._on_error)
 
         # ping_timeout is for no blocking call
-        self._ws.run_forever(ping_interval=6, ping_timeout=self.ping_timeout)
+        self._ws.run_forever(ping_timeout=self.ping_timeout)
 
     def _on_open(self, websocket):
         self._user_on_open()
@@ -242,9 +259,7 @@ class Pushbullet():
         # something has changed on the server /v2/pushes resources
         elif data['type'] == 'tickle' and data['subtype'] == 'push':
             for push in self.getPushes():
-                if push['modified'] > self._last_modified:
-                    if self._user_on_message(push):
-                        self.dismissPush(push['iden'])
+                self._user_on_message(push)
 
     def _on_close(self, websocket):
         self._user_on_close()
@@ -257,7 +272,7 @@ class Pushbullet():
         Send arbitrary JSON messages, called "ephemerals", to all devices on your account.
         """
 
-        # init default data
+        # init defautl data
         data.update({
             'type': 'mirror',
             'package_name': 'com.xbmc.service.pushbullet',
