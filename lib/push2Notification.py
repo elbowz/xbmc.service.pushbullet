@@ -23,10 +23,6 @@ class Push2Notification():
         self.re_kodiCmd= re.compile('kcmd::(?P<cmd>[a-zA-Z0-9_.-]+)')
         self.re_kodiCmdPlaceholder = re.compile('<\$([a-zA-Z0-9_\[\]]+)>')
 
-
-        self.re_youtubeMatchLink = re.compile('http://youtu\.be/(?P<id>[a-zA-Z0-9_-]+)', re.IGNORECASE)
-        self.re_youtubeMatch2Link = re.compile('https?://www\.youtube\.com/watch\?v=(?P<id>[a-zA-Z0-9_-]+)', re.IGNORECASE)
-
     def onMessage(self, message):
         try:
             from json import dumps
