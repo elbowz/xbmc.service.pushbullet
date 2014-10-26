@@ -259,7 +259,8 @@ class Pushbullet():
         # something has changed on the server /v2/pushes resources
         elif data['type'] == 'tickle' and data['subtype'] == 'push':
             for push in self.getPushes():
-                self._user_on_message(push)
+                if self._user_on_message(push):
+                    self.dismissPush(push['iden'])
 
     def _on_close(self, websocket):
         self._user_on_close()
