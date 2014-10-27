@@ -112,7 +112,7 @@ class Pushbullet():
         modified_after = self._last_modified if modified_after is 0 else modified_after
 
         self._response = self._h.request(
-            self.base_url + self._REST_URLS['pushes'] + '?modified_after=' + str(modified_after), method='GET')
+            self.base_url + self._REST_URLS['pushes'] + '?modified_after=' + '{0:10f}'.format(modified_after), method='GET') # Modified after must be formated or it will be rounded to the nearest 1/100
 
         pushes = self._getResponse(json_format_response=True)['pushes']
 
