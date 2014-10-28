@@ -22,6 +22,7 @@
         <setting id="handling_note"    label="32111" type="enum" lvalues="32116|32117|32118" default="0"/>
         <setting id="handling_list"    label="32112" type="enum" lvalues="32116|32117|32118" default="0"/>
         <setting id="handling_address" label="32113" type="enum" lvalues="32116|32117|32118" default="0"/>
+        <setting id="interrupt_media" label="32119" type="bool" default="false"/>
     </category>
     <category label="30001">
         <setting id="pb_mirroring" label="30040" type="bool" default="true"/>

@@ -1,3 +1,7 @@
+0.8.6b
+- Fix for pushes sent when Kodi is off all being played when push is received
+- Added setting 'Interrupt Playing Media' (Default: False)
+
 0.8.4b
 - Fix for pushes playing last video unstead of pushed video
 

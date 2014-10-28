@@ -476,3 +476,7 @@ msgstr ""
 msgctxt "#32118"
 msgid "Ignore"
 msgstr ""
+
+msgctxt "#32119"
+msgid "Interrupt Playing Media"
+msgstr ""
