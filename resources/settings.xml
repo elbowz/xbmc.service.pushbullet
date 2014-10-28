@@ -35,7 +35,7 @@
         <setting id="pb_mirroring_out_media_nfo" label="30051" type="bool" subsetting="true" enable="eq(-1,true)" default="true"/>
         <setting id="ephmeral_test_action" label="30052" type="action" action="RunScript(service.pushbullet,SEND_EPHEMERAL_TEST)" />
         <setting label="30011" type="lsep"/>
-        <setting id="cmd_on_dismiss_push" label="30053" type="labelenum" values="Stop|Pause|Next|None" enable="eq(-3,true)"/>
+        <setting id="cmd_on_dismiss_push" label="30053" type="labelenum" values="Stop|Pause|Next|None" default="Stop" enable="eq(-3,true)"/>
     </category>
     <category label="32003">
         <setting id="load_video_thumbs" type="bool" default="false" label="32011" />
