@@ -57,6 +57,7 @@ class Pushbullet():
         self._ws_thread = None
         self._ws_thread_keep_alive = None
         self._response = None
+        self._abortRequested = False
         
         self._last_modified_callback = last_modified_callback
         self.initLastModified(last_modified)
