@@ -79,7 +79,7 @@ class Service:
 
             # init pushbullet
             self.pushbullet = Pushbullet(   access_token=self.stg_pbAccessToken,
-                                            ping_timeout=2,
+                                            ping_timeout=6,
                                             last_modified=getSetting('last_modified',0),
                                             last_modified_callback=self.setLastModified
             )
