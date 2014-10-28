@@ -56,6 +56,7 @@ class Pushbullet():
         self._ws_thread_keep_alive = None
         self._response = None
         self._last_modified = 0
+        self._abortRequested = False
 
         self._user_on_open = None
         self._user_on_message = None
@@ -211,23 +212,32 @@ class Pushbullet():
     def _webSocketThreadKeepAlive(self):
         evtThreadEnded = None
 
-        while True:
+        while not self._abortRequested:
+            # wait websocket disconnection (only on windows)
+            # first start don't wait
             if not evtThreadEnded or evtThreadEnded.wait():
                 # not first start
                 if evtThreadEnded:
 
                     evtThreadEnded.clear()
 
-                    if self.try_reconnect < 0:
-                        return
+                    # wait try_reconnect seconds before try to reconnect
+                    for i in range(self.try_reconnect):
 
-                    import time
-                    time.sleep(self.try_reconnect)
+                        # if add-on is closed
+                        if self._abortRequested: break
+
+                        import time
+                        time.sleep(1)
+
+                if self._abortRequested: break
 
                 evtThreadEnded = threading.Event()
-
+                # start real websocket thread
                 self._ws_thread = threading.Thread(target=self._websocketThread, kwargs={'evtThreadEnded': evtThreadEnded})
                 self._ws_thread.start()
+
+        self._ws_thread.join()
 
     def _websocketThread(self, evtThreadEnded):
         try:
@@ -399,6 +409,8 @@ class Pushbullet():
         """
         Stop Real Time Event Stream
         """
+        self._abortRequested = True
+
         if self._ws:
             self._ws.close()
 
