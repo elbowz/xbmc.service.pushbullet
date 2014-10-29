@@ -42,4 +42,7 @@
         <setting id="selected_device" label="32012" type="action" action="RunScript(service.pushbullet,SELECT_DEVICE)" />
         <setting id="default_view_mode" type="enum" label="32013" lvalues="32016|32017|32018" default="0" enable="eq(-1,)" />
     </category>
+     <category label="32120">
+        <setting id="debug_logging" type="bool" default="false" label="32121" />
+    </category>
 </settings>

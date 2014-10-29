@@ -18,6 +18,10 @@ def localise(id):
 
 
 def log(txt, level=xbmc.LOGDEBUG):
+    if getSetting('debug_logging',False) and not xbmc.getCondVisibility('System.GetBool(debug.showloginfo)'):
+        if not level == xbmc.LOGERROR:
+            level = xbmc.LOGNOTICE
+
     if isinstance(txt, str):
         txt = txt.decode("utf-8")
     message = u'[%s]: %s' % (__addonname__, txt)
