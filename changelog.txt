@@ -1,3 +1,7 @@
+0.8.10b
+- Fix issue causing the service not to connect to the push server after authorization
+- Push handling settings now default to notification for all push types
+
 0.8.8b
 - Fix for error causing service startup to fail
 
