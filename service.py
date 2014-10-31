@@ -81,8 +81,7 @@ class Service:
             self.pushbullet = Pushbullet(   access_token=self.stg_pbAccessToken,
                                             ping_timeout=6,
                                             last_modified=getSetting('last_modified',0),
-                                            last_modified_callback=self.setLastModified
-            )
+                                            last_modified_callback=self.setLastModified)
 
             # get device info (also if edited by user on Pushbullet panel)
             self._getDevice()

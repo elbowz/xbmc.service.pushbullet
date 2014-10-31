@@ -1,8 +1,7 @@
 import xbmc
-import xbmcaddon
 from util import * #TODO: Move util funtions to here
 
-__addon__        = xbmcaddon.Addon()
+__addon__        = ADDON
 __addonid__      = __addon__.getAddonInfo('id')
 __addonversion__ = __addon__.getAddonInfo('version')
 __addonname__    = __addon__.getAddonInfo('name')
