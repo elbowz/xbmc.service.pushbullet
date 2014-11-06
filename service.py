@@ -266,6 +266,7 @@ class Service:
                     if thumbnailFilePath:
                         try:
                             icon = fileTobase64(thumbnailFilePath, imgFormat='JPEG', imgSize=(72, 72))
+                            if not icon: raise Exception('No Icon')
                         except:
                             icon = self.xbmcImgEncoded
 
