@@ -19,9 +19,9 @@
         <setting id="handling_video"   label="32108" type="enum" lvalues="32115|32117|32118" default="0"/>
         <setting id="handling_audio"   label="32109" type="enum" lvalues="32115|32117|32118" default="0"/>
         <setting id="handling_image"   label="32110" type="enum" lvalues="32116|32117|32118" default="0"/>
-        <setting id="handling_note"    label="32111" type="enum" lvalues="32116|32117|32118" default="0"/>
-        <setting id="handling_list"    label="32112" type="enum" lvalues="32116|32117|32118" default="0"/>
-        <setting id="handling_address" label="32113" type="enum" lvalues="32116|32117|32118" default="0"/>
+        <setting id="handling_note"    label="32111" type="enum" lvalues="32116|32117|32118" default="1"/>
+        <setting id="handling_list"    label="32112" type="enum" lvalues="32116|32117|32118" default="1"/>
+        <setting id="handling_address" label="32113" type="enum" lvalues="32116|32117|32118" default="1"/>
         <setting id="interrupt_media" label="32119" type="bool" default="false"/>
     </category>
     <category label="30001">
@@ -41,5 +41,8 @@
         <setting id="load_video_thumbs" type="bool" default="false" label="32011" />
         <setting id="selected_device" label="32012" type="action" action="RunScript(service.pushbullet,SELECT_DEVICE)" />
         <setting id="default_view_mode" type="enum" label="32013" lvalues="32016|32017|32018" default="0" enable="eq(-1,)" />
+    </category>
+     <category label="32120">
+        <setting id="debug_logging" type="bool" default="false" label="32121" />
     </category>
 </settings>
