@@ -1,3 +1,6 @@
+0.8.12b
+- Fix issue with mirror pushes failing due to missing PIL on some platforms
+
 0.8.10b
 - Fix issue causing the service not to connect to the push server after authorization
 - Push handling settings now default to notification for all push types
