@@ -2,7 +2,7 @@
 import xbmc, xbmcgui
 import urllib
 import YDStreamExtractor as StreamExtractor
-
+import YDStreamUtils as StreamUtils
 import common
 
 def getURLMediaType(url):
@@ -131,6 +131,9 @@ def playMedia(url,title='',thumb='',description='',playlist_type=xbmc.PLAYLIST_V
     pl.clear()
     pl.add(url,li)
     xbmc.Player().play(pl)
+
+def mediaPlaying(): #TODO: make sure we're checking for all media
+    return StreamUtils.isPlaying()
 
 #    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Playlist.Clear","params":{"playlistid":1}}')
 #    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Playlist.Add","params":{"playlistid":1,"item":{"file":"' + str(url) + '"}}}')

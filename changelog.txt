@@ -1,5 +1,18 @@
+0.8.12b
+- Fix issue with mirror pushes failing due to missing PIL on some platforms
+- Push handling settings now default to play instantly for media and notification for all others
+
+0.8.10b
+- Fix issue causing the service not to connect to the push server after authorization
+- Push handling settings now default to notification for all push types
+
+0.8.8b
+- Fix for error causing service startup to fail
+
 0.8.6b
-- Fix for .mov files from apple.com not playing
+- Fix for pushes sent when Kodi is off all being played when push is received
+- Added setting 'Interrupt Playing Media' (Default: False)
+- Will now reconnect on disconnection from push server
 
 0.8.4b
 - Fix for pushes playing last video unstead of pushed video
