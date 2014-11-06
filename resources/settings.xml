@@ -16,9 +16,9 @@
     </category>
     <category label="32107">
         <setting label="32114" type="lsep"/>
-        <setting id="handling_video"   label="32108" type="enum" lvalues="32115|32117|32118" default="1"/>
-        <setting id="handling_audio"   label="32109" type="enum" lvalues="32115|32117|32118" default="1"/>
-        <setting id="handling_image"   label="32110" type="enum" lvalues="32116|32117|32118" default="1"/>
+        <setting id="handling_video"   label="32108" type="enum" lvalues="32115|32117|32118" default="0"/>
+        <setting id="handling_audio"   label="32109" type="enum" lvalues="32115|32117|32118" default="0"/>
+        <setting id="handling_image"   label="32110" type="enum" lvalues="32116|32117|32118" default="0"/>
         <setting id="handling_note"    label="32111" type="enum" lvalues="32116|32117|32118" default="1"/>
         <setting id="handling_list"    label="32112" type="enum" lvalues="32116|32117|32118" default="1"/>
         <setting id="handling_address" label="32113" type="enum" lvalues="32116|32117|32118" default="1"/>
