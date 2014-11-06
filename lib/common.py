@@ -100,19 +100,22 @@ def base64ToFile(strBase64, filePath, imgFormat='JPEG', imgSize=None):
     # change image size and set format
     if imgSize:
         import cStringIO
-        from PIL import Image
-
         file = cStringIO.StringIO(fileDecoded)
-
-        img = Image.open(file)
-        img.thumbnail(imgSize, Image.BICUBIC)
-        img.save(filePath, format=imgFormat)
-
+        try:
+            from PIL import Image
+    
+            img = Image.open(file)
+            img.thumbnail(imgSize, Image.BICUBIC)
+            img.save(filePath, format=imgFormat)
+            return filePath
+        except ImportError: #Some platforms don't have PIL...
+            log('base64ToFile(): PIL Not available - skipping resize')
+            pass #So we just fallback to saving
+            
     # only save image (do not image transformation)
-    else:
-        file = open(filePath, "wb")
-        file.write(fileDecoded)
-        file.close()
+    file = open(filePath, "wb")
+    file.write(fileDecoded)
+    file.close()
 
     return filePath
 
@@ -126,22 +129,44 @@ def fileTobase64(filePath, imgFormat='JPEG', imgSize=None):
     f = xbmcvfs.File(filePath)
     file = f.readBytes()
     f.close()
-
+    size = len(file)
+    
     # change image size and set format
     if imgSize:
-        import cStringIO
-        from PIL import Image
+        try:
+            from PIL import Image
+            import cStringIO
+            
+            file = cStringIO.StringIO(file)
+    
+            img = Image.open(file)
+            img.thumbnail(imgSize, Image.BICUBIC)
+            
+            output = cStringIO.StringIO()
+            img.save(output, imgFormat)
+    
+            imgEncoded = base64.b64encode(output.getvalue())
+            output.close()
+            return imgEncoded
+        except ImportError:
+            log('fileTobase64(): PIL Not available - falling back to limpp')
 
-        file = cStringIO.StringIO(file)
+        try:
+            import limpp
+            from io import BytesIO
 
-        img = Image.open(file)
-        img.thumbnail(imgSize, Image.BICUBIC)
+            with BytesIO() as outputIO:
+                with BytesIO(file) as inputIO:
+                    img = limpp.Get_image(size=size,file=inputIO)
+                    limpp.Manipulator(img).Scale(*imgSize)
+                    img.Write_PNG(outputIO)
+                imgEncoded = base64.b64encode(outputIO.getvalue())
+            return imgEncoded
+        except:
+            traceError()
+            log('fileTobase64(): No resizing available - returning None')
 
-        output = cStringIO.StringIO()
-        img.save(output, imgFormat)
-
-        imgEncoded = base64.b64encode(output.getvalue())
-        output.close()
+        return None
 
     # only save image (do not image transformation)
     else:
