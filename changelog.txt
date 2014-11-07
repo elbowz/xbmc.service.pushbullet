@@ -1,3 +1,6 @@
+0.8.14b
+- Fix for YouTube videos from playlists not playing (As well as playlists for a few other sites)
+
 0.8.12b
 - Fix issue with mirror pushes failing due to missing PIL on some platforms
 - Push handling settings now default to play instantly for media and notification for all others
