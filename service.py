@@ -54,7 +54,7 @@ class Service:
         self.run()
 
         while not xbmc.abortRequested:
-            xbmc.sleep(1000)
+            xbmc.sleep(200)
 
         log('Closing socket (waiting...)')
 
@@ -95,7 +95,7 @@ class Service:
                                                 on_error=self.push2Notification.onError,
                                                 on_close=self.push2Notification.onClose)
 
-            log('Started successful')
+            log('Service started successfully')
 
         except Exception as ex:
             traceError()
@@ -141,21 +141,21 @@ class Service:
 
             self._getSettings()
             self.run()
-        
+
         # if access token is set and...
         elif self.stg_pbAccessToken:
-            
+
             # ...client_iden has been set => (re)start service
             if not self.stg_pbClientIden and __addon__.getSetting('pb_client_iden'):
                 log('Device has been set')
-                 
+
                 self._getSettings()
                 self.run()
 
             # ...one of the listed settings are changed  => read setting setup service
             elif self._isSettingChanged():
                 log('Setting is changed by user')
-    
+
                 self._getSettings()
                 self._setupService()
 
