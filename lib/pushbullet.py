@@ -239,7 +239,6 @@ class Pushbullet():
             # start real websocket thread
             self._ws_thread = threading.Thread(target=self._websocketThread, name="Push.Server.Connection", kwargs={'evtThreadEnded': evtThreadEnded})
             self._ws_thread.start()
-
             # wait for websocket disconnection
             evtThreadEnded.wait()
 
@@ -249,6 +248,9 @@ class Pushbullet():
 
             self._log('Reconnecting: Waiting {0} seconds...'.format(self.try_reconnect))
             self.safeSleep(self.try_reconnect)
+
+            evtThreadEnded.clear()
+
             tryCount+=1
 
     def _websocketThread(self, evtThreadEnded):
