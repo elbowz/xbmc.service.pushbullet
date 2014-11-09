@@ -31,15 +31,6 @@ def traceError():
     import traceback
     xbmc.log(traceback.format_exc(), level=xbmc.LOGERROR)
 
-def safeSleep(seconds):
-    # wait seconds before trying to reconnect, check for abortRequested every 100ms
-    for i in range(seconds * 10):
-
-        # if add-on is closed
-        if xbmc.abortRequested: return
-
-        xbmc.sleep(100)
-
 def showNotification(title, message, timeout=2000, icon=__addonicon__):
     if showNotification.proportionalTextLengthTimeout:
         timeout = len(message)/10*2000
