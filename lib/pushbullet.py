@@ -4,8 +4,6 @@ import httplib2
 import websocket
 import threading
 
-from common import traceError
-
 class Pushbullet():
     """
     Higher level of Pushbullet APIs are provided.
@@ -13,7 +11,7 @@ class Pushbullet():
 
     def __init__(self, access_token=None, user_iden=None, device_iden=None, filter_deny={}, filter_allow={},
                  mirror_mode=True, view_channels = True, base_url='https://api.pushbullet.com/v2/', ping_timeout=6,
-                 try_reconnect=10, json_format_response=True, last_modified=0, last_modified_callback=None):
+                 try_reconnect=10, json_format_response=True, last_modified=0, last_modified_callback=None, log_callback=None):
         """
         access_token: access toke.
         user_iden; used for send and receive ephemerals (if not set receive all pushes)
@@ -40,6 +38,8 @@ class Pushbullet():
         self.ping_timeout = ping_timeout
         self.try_reconnect = try_reconnect
         self.json_format_response = json_format_response
+        self._last_modified_callback = last_modified_callback
+        self._log_callback = log_callback
 
         self._h = httplib2.Http()
         self._h.add_credentials(self.access_token, '')
@@ -58,14 +58,23 @@ class Pushbullet():
         self._ws_thread_keep_alive = None
         self._response = None
         self._abortRequested = False
-        
-        self._last_modified_callback = last_modified_callback
-        self.initLastModified(last_modified)
 
         self._user_on_open = None
         self._user_on_message = None
         self._user_on_close = None
         self._user_on_error = None
+
+        self.initLastModified(last_modified)
+
+    def safeSleep(self,seconds):
+        # wait seconds before trying to reconnect, check for abortRequested every 100ms
+        import time
+        for i in range(seconds * 10):
+
+            # if add-on is closed
+            if self._abortRequested: return
+
+            time.sleep(0.1)
 
     def initLastModified(self,last_modified):
         self._last_modified = last_modified
@@ -76,7 +85,7 @@ class Pushbullet():
             self._last_modified = pushes[0].get('modified',0)
             if self._last_modified_callback: self._last_modified_callback(self._last_modified)
         except:
-            traceError()
+            self._traceError()
 
     def getUserInfo(self, json_format_response=None):
         """
@@ -218,38 +227,30 @@ class Pushbullet():
         self._user_on_error = on_error
 
         # Start thread and reconnect if disconnect
-        self._ws_thread_keep_alive = threading.Thread(target=self._webSocketThreadKeepAlive)
+        self._ws_thread_keep_alive = threading.Thread(target=self._webSocketThreadKeepAlive, name="Push.Server.KeepAlive")
         self._ws_thread_keep_alive.start()
 
     def _webSocketThreadKeepAlive(self):
-        evtThreadEnded = None
-
+        evtThreadEnded = threading.Event()
+        tryCount = 1
         while not self._abortRequested:
-            # wait websocket disconnection (only on windows)
-            # first start don't wait
-            if not evtThreadEnded or evtThreadEnded.wait():
-                # not first start
-                if evtThreadEnded:
+            self._log('Starting Pushbullet server connection thread. Try #{0}'.format(tryCount))
+            # start real websocket thread
+            self._ws_thread = threading.Thread(target=self._websocketThread, name="Push.Server.Connection", kwargs={'evtThreadEnded': evtThreadEnded})
+            self._ws_thread.start()
+            # wait for websocket disconnection
+            evtThreadEnded.wait()
 
-                    evtThreadEnded.clear()
+            self._log('Pushbullet server connection thread finished')
 
-                    # wait try_reconnect seconds before try to reconnect
-                    for i in range(self.try_reconnect):
+            if self._abortRequested: break
 
-                        # if add-on is closed
-                        if self._abortRequested: break
+            self._log('Reconnecting: Waiting {0} seconds...'.format(self.try_reconnect))
+            self.safeSleep(self.try_reconnect)
 
-                        import time
-                        time.sleep(1)
+            evtThreadEnded.clear()
 
-                if self._abortRequested: break
-
-                evtThreadEnded = threading.Event()
-                # start real websocket thread
-                self._ws_thread = threading.Thread(target=self._websocketThread, kwargs={'evtThreadEnded': evtThreadEnded})
-                self._ws_thread.start()
-
-        self._ws_thread.join()
+            tryCount+=1
 
     def _websocketThread(self, evtThreadEnded):
         try:
@@ -269,6 +270,13 @@ class Pushbullet():
             self._on_error(websocket, ex)
         finally:
             evtThreadEnded.set()
+
+    def _log(self,message): #TODO: Pass in a logging function in __init__()
+        if self._log_callback: self._log_callback(message)
+
+    def _traceError(self):
+        import traceback
+        self._log(traceback.format_exc())
 
     def _on_open(self, websocket):
         self._user_on_open()

@@ -103,7 +103,7 @@ def base64ToFile(strBase64, filePath, imgFormat='JPEG', imgSize=None):
         file = cStringIO.StringIO(fileDecoded)
         try:
             from PIL import Image
-    
+
             img = Image.open(file)
             img.thumbnail(imgSize, Image.BICUBIC)
             img.save(filePath, format=imgFormat)
@@ -111,7 +111,7 @@ def base64ToFile(strBase64, filePath, imgFormat='JPEG', imgSize=None):
         except ImportError: #Some platforms don't have PIL...
             log('base64ToFile(): PIL Not available - skipping resize')
             pass #So we just fallback to saving
-            
+
     # only save image (do not image transformation)
     file = open(filePath, "wb")
     file.write(fileDecoded)
@@ -130,21 +130,21 @@ def fileTobase64(filePath, imgFormat='JPEG', imgSize=None):
     file = f.readBytes()
     f.close()
     size = len(file)
-    
+
     # change image size and set format
     if imgSize:
         try:
             from PIL import Image
             import cStringIO
-            
+
             file = cStringIO.StringIO(file)
-    
+
             img = Image.open(file)
             img.thumbnail(imgSize, Image.BICUBIC)
-            
+
             output = cStringIO.StringIO()
             img.save(output, imgFormat)
-    
+
             imgEncoded = base64.b64encode(output.getvalue())
             output.close()
             return imgEncoded
