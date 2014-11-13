@@ -32,10 +32,7 @@ class Push2Notification():
                 if 'icon' in message:
                     iconPath = base64ToFile(message['icon'], self.imgFilePath, imgFormat='JPEG', imgSize=(96, 96))
 
-                    if 'body' in message:
-                        body = message['body'].rstrip('\n').replace('\n', ' / ')
-                    else:
-                        body = None
+                    body = message.get('body','').rstrip('\n').replace('\n', ' / ')
 
                     showNotification(message["application_name"], body, self.notificationTime, iconPath)
 
@@ -67,7 +64,7 @@ class Push2Notification():
         mediaType = pushhandler.canHandle(message)
         if not mediaType: return False
         return self.handleMediaPush(mediaType,message)
-    
+
     def _onMessageFile(self, message):
         mediaType = pushhandler.canHandle(message)
         if not mediaType: return False
