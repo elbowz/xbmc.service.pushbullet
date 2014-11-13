@@ -73,10 +73,10 @@ class Push2Notification():
     def _onMessageNote(self, message):
         if not self.executeKodiCmd(message):
             # Show instantly if enabled
-            if getSetting('handling_note',0) == 0 and pushhandler.canHandle(message):
+            if common.getSetting('handling_note',0) == 0 and pushhandler.canHandle(message):
                 pushhandler.handlePush(message)
             # else show notification if enabled
-            elif getSetting('handling_note',0) == 1:
+            elif common.getSetting('handling_note',0) == 1:
                 self.showNotificationFromMessage(message)
             else:
                 return False
@@ -84,9 +84,9 @@ class Push2Notification():
 
     def _onMessageAddress(self, message):
         # Show instantly if enabled
-        if getSetting('handling_address',0) == 0 and pushhandler.canHandle(message):
+        if common.getSetting('handling_address',0) == 0 and pushhandler.canHandle(message):
             pushhandler.handlePush(message)
-        elif getSetting('handling_address',0) == 1:
+        elif common.getSetting('handling_address',0) == 1:
             self.showNotificationFromMessage(message)
         else:
             return False
@@ -94,9 +94,9 @@ class Push2Notification():
 
     def _onMessageList(self, message):
         # Show instantly if enabled
-        if getSetting('handling_list',0) == 0 and pushhandler.canHandle(message):
+        if common.getSetting('handling_list',0) == 0 and pushhandler.canHandle(message):
             pushhandler.handlePush(message)
-        elif getSetting('handling_list',0) == 1:
+        elif common.getSetting('handling_list',0) == 1:
             self.showNotificationFromMessage(message)
         else:
             return False
@@ -144,12 +144,12 @@ class Push2Notification():
     def handleMediaPush(self, media_type, message):
         # Check if instant play is enabled for the media type and play
         if media_type in ('video','audio','image'):
-            if getSetting('handling_{0}'.format(media_type),0) == 0:
-                if not pushhandler.mediaPlaying() or getSetting('interrupt_media',False):
+            if common.getSetting('handling_{0}'.format(media_type),0) == 0:
+                if not pushhandler.mediaPlaying() or common.getSetting('interrupt_media',False):
                     pushhandler.handlePush(message)
                     return True
 
-        if getSetting('handling_{0}'.format(media_type),0) == 1:
+        if common.getSetting('handling_{0}'.format(media_type),0) == 1:
             self.showNotificationFromMessage(message)
             return True
         return False
