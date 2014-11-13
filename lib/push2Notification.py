@@ -1,5 +1,5 @@
 import xbmc
-from lib.common import *
+from lib import common
 from lib import pushhandler
 
 class Push2Notification():
@@ -26,18 +26,18 @@ class Push2Notification():
     def onMessage(self, message):
         try:
             from json import dumps
-            log('New push (%s) received: %s' % (message['type'], dumps(message)))
+            common.log('New push (%s) received: %s' % (message['type'], dumps(message)))
 
             if message['type'] == 'mirror':
                 if 'icon' in message:
-                    iconPath = base64ToFile(message['icon'], self.imgFilePath, imgFormat='JPEG', imgSize=(96, 96))
+                    iconPath = common.base64ToFile(message['icon'], self.imgFilePath, imgFormat='JPEG', imgSize=(96, 96))
 
                     if 'body' in message:
                         body = message['body'].rstrip('\n').replace('\n', ' / ')
                     else:
                         body = None
 
-                    showNotification(message["application_name"], body, self.notificationTime, iconPath)
+                    common.showNotification('%s: %s' % (message["application_name"], message['title']), body, self.notificationTime, iconPath)
 
             # kodi action (pause, stop, skip) on push dismiss (from devices)
             elif message['type'] == 'dismissal':
@@ -60,8 +60,8 @@ class Push2Notification():
 
 
         except Exception as ex:
-            traceError()
-            log(' '.join(str(arg) for arg in ex.args), xbmc.LOGERROR)
+            common.traceError()
+            common.log(' '.join(str(arg) for arg in ex.args), xbmc.LOGERROR)
 
     def _onMessageLink(self, message):
         mediaType = pushhandler.canHandle(message)
@@ -112,29 +112,29 @@ class Push2Notification():
         "source_user_iden": "ujy9SIuzSFw", "source_device_iden": "ujy9SIuzSFwsjzWIEVDzOK", "type": "dismissal"}
         """
         if message['notification_id'] == self.pbPlaybackNotificationId:
-            log('Execute action on dismiss push: %s' % cmd)
+            common.log('Execute action on dismiss push: %s' % cmd)
 
-            result = executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1}')
+            result = common.executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1}')
 
             if len(result) > 0:
                 playerId = result[0]['playerid']
 
                 if cmd == 'pause':
-                    executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.PlayPause", "params": { "playerid":' + str(playerId) + '}, "id": 1}')
+                    common.executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.PlayPause", "params": { "playerid":' + str(playerId) + '}, "id": 1}')
                 elif cmd == 'stop':
-                    executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.Stop", "params": { "playerid":' + str(playerId) + '}, "id": 1}')
+                    common.executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.Stop", "params": { "playerid":' + str(playerId) + '}, "id": 1}')
                 elif cmd == 'next':
-                    executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GoTo", "params": { "playerid":' + str(playerId) + ', "to": "next"}, "id": 1}')
+                    common.executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GoTo", "params": { "playerid":' + str(playerId) + ', "to": "next"}, "id": 1}')
 
     def onError(self, error):
-        log(error, xbmc.LOGERROR)
-        showNotification(localise(30101), error, self.notificationTime, self.notificationIcon)
+        common.log(error, xbmc.LOGERROR)
+        common.showNotification(common.localise(30101), error, self.notificationTime, self.notificationIcon)
 
     def onClose(self):
-        log('Socket closed')
+        common.log('Socket closed')
 
     def onOpen(self):
-        log('Socket opened')
+        common.log('Socket opened')
 
     def showNotificationFromMessage(self,message):
         title = message.get('title',message.get('name',message.get('file_name',''))) or message.get('url','').rsplit('/',1)[-1]
@@ -142,7 +142,7 @@ class Push2Notification():
         if not body and message['type'] == 'list':
             body = '{0} items'.format(len(message.get('items',[])))
 
-        showNotification(title, body, self.notificationTime, self.notificationIcon)
+        common.showNotification(title, body, self.notificationTime, self.notificationIcon)
 
     def handleMediaPush(self, media_type, message):
         # Check if instant play is enabled for the media type and play
@@ -179,13 +179,13 @@ class Push2Notification():
                             # format with passed params
                             jsonrpc = jsonrpc.format(params=params)
 
-                        log('Executing cmd "%s": %s' % (cmd, jsonrpc))
+                        common.log('Executing cmd "%s": %s' % (cmd, jsonrpc))
 
-                        result = executeJSONRPC(jsonrpc)
+                        result = common.executeJSONRPC(jsonrpc)
 
-                        log('Result for cmd "%s": %s' % (cmd, result))
+                        common.log('Result for cmd "%s": %s' % (cmd, result))
 
-                        title = localise(30104) % cmd
+                        title = common.localise(30104) % cmd
                         body = ''
 
                         if 'notification' in cmdObj:
@@ -195,16 +195,16 @@ class Push2Notification():
                             body = body.format(result=result)
 
                     except Exception as ex:
-                        title = 'ERROR: ' + localise(30104) % cmd
+                        title = 'ERROR: ' + common.localise(30104) % cmd
                         body = ' '.join(str(arg) for arg in ex.args)
-                        log(body, xbmc.LOGERROR)
-                        traceError()
+                        common.log(body, xbmc.LOGERROR)
+                        common.traceError()
 
-                    showNotification(title, body, self.notificationTime, self.kodiCmdsNotificationIcon)
+                    common.showNotification(title, body, self.notificationTime, self.kodiCmdsNotificationIcon)
                     return True
 
                 else:
-                    log('No "%s" cmd founded!' % cmd, xbmc.LOGERROR)
+                    common.log('No "%s" cmd founded!' % cmd, xbmc.LOGERROR)
 
         return False
 
