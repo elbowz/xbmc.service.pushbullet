@@ -30,11 +30,22 @@ class Push2Notification():
 
             if message['type'] == 'mirror':
                 if 'icon' in message:
-                    iconPath = common.base64ToFile(message['icon'], self.imgFilePath, imgFormat='JPEG', imgSize=(96, 96))
 
+                    # BUILD KODI NOTIFICATION
+                    applicationNameMirrored = message.get('application_name', '')
+                    titleMirrored = message.get('title', '')
+
+                    # Add Title...
+                    title = applicationNameMirrored if not titleMirrored else applicationNameMirrored + ': '
+                    title += titleMirrored
+
+                    # ...Body...
                     body = message.get('body','').rstrip('\n').replace('\n', ' / ')
 
-                    common.showNotification('%s: %s' % (message["application_name"], message['title']), body, self.notificationTime, iconPath)
+                    # ...and Icon
+                    iconPath = common.base64ToFile(message['icon'], self.imgFilePath, imgFormat='JPEG', imgSize=(96, 96))
+
+                    common.showNotification(title, body, self.notificationTime, iconPath)
 
             # kodi action (pause, stop, skip) on push dismiss (from devices)
             elif message['type'] == 'dismissal':
