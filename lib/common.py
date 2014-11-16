@@ -51,11 +51,35 @@ def executeJSONRPC(jsonStr):
 
     return response
 
+def executeJSONRPCMetchod(method, params={}):
+
+    rpc = {
+        'jsonrpc': '2.0',
+        'method': method,
+        'params': params,
+        'id': 1
+    }
+
+    # Check if is there is an active player
+    activePlayers = executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1}')
+
+    if len(activePlayers) > 0:
+
+        del activePlayers[0]['type']
+        rpc['params'].update(activePlayers[0])
+
+        if method == 'Player.GoTo':
+            rpc['params'].setdefault('to', 'next')
+
+        from json import dumps
+
+        return executeJSONRPC(dumps(rpc))
+
+    return False
 
 def getMainSetting(name):
     result = executeJSONRPC('{ "jsonrpc": "2.0", "method": "Settings.GetSettingValue", "params": {"setting": "' + str(name) + '"}, "id": 1 }')
     return result['value']
-
 
 def getKodiCmdsFromFiles():
     import os

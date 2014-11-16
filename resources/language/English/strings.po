@@ -40,7 +40,7 @@ msgid "Account"
 msgstr ""
 
 msgctxt "#30011"
-msgid "Settings"
+msgid "Action trigger"
 msgstr ""
 
 msgctxt "#30012"
@@ -90,7 +90,11 @@ msgid "Send a test notification"
 msgstr ""
 
 msgctxt "#30053"
-msgid "Playback action when push is dismissed on device"
+msgid "Media notification is dismissed on device"
+msgstr ""
+
+msgctxt "#30054"
+msgid "Incoming Phone call on device"
 msgstr ""
 
 
