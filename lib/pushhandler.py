@@ -6,9 +6,7 @@ import YDStreamUtils as StreamUtils
 import common
 
 StreamExtractor.overrideParam('noplaylist',True)
-StreamExtractor.generateBlacklist(('.*:(?:user|channel|search)$',))
-
-common.log('Youtube-DL ignored URL Types: {0}'.format(', '.join(StreamExtractor._BLACKLIST)))
+StreamExtractor.generateBlacklist(('.*:(?:user|channel|search)$','(?i)generic.*'))
 
 def getURLMediaType(url):
     if url.startswith('http'):
