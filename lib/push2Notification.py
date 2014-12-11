@@ -7,12 +7,13 @@ class Push2Notification():
     Pushbullet push to Kodi Notification
     """
 
-    def __init__(self, notificationTime=6000, notificationIcon=None, tempPath=None, pbPlaybackNotificationId=None, cmdOnDismissPush='stop', kodiCmds=None, kodiCmdsNotificationIcon=None):
+    def __init__(self, notificationTime=6000, notificationIcon=None, tempPath=None, pbPlaybackNotificationId=None, cmdOnDismissPush='stop', cmdOnPhoneCallPush='pause', kodiCmds=None, kodiCmdsNotificationIcon=None):
         self.notificationTime = notificationTime
         self.notificationIcon = notificationIcon
         self.tempPath = tempPath
         self.pbPlaybackNotificationId = pbPlaybackNotificationId
         self.cmdOnDismissPush = cmdOnDismissPush
+        self.cmdOnPhoneCallPush = cmdOnPhoneCallPush
         self.kodiCmds = kodiCmds
         self.kodiCmdsNotificationIcon = kodiCmdsNotificationIcon
 
@@ -29,23 +30,7 @@ class Push2Notification():
             common.log('New push (%s) received: %s' % (message['type'], dumps(message)))
 
             if message['type'] == 'mirror':
-                if 'icon' in message:
-
-                    # BUILD KODI NOTIFICATION
-                    applicationNameMirrored = message.get('application_name', '')
-                    titleMirrored = message.get('title', '')
-
-                    # Add Title...
-                    title = applicationNameMirrored if not titleMirrored else applicationNameMirrored + ': '
-                    title += titleMirrored
-
-                    # ...Body...
-                    body = message.get('body','').rstrip('\n').replace('\n', ' / ')
-
-                    # ...and Icon
-                    iconPath = common.base64ToFile(message['icon'], self.imgFilePath, imgFormat='JPEG', imgSize=(96, 96))
-
-                    common.showNotification(title, body, self.notificationTime, iconPath)
+                return self._onMirrorPush(message)
 
             # kodi action (pause, stop, skip) on push dismiss (from devices)
             elif message['type'] == 'dismissal':
@@ -114,6 +99,7 @@ class Push2Notification():
         return True
 
     def _onDismissPush(self, message, cmd):
+
         # TODO: add package_name, source_device_iden for be sure is the right dismission
         """
         {"notification_id": 1812, "package_name": "com.podkicker", "notification_tag": null,
@@ -122,17 +108,51 @@ class Push2Notification():
         if message['notification_id'] == self.pbPlaybackNotificationId:
             common.log('Execute action on dismiss push: %s' % cmd)
 
-            result = common.executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1}')
+            if cmd == 'pause':
+                common.executeJSONRPCMetchod('Player.PlayPause')
+            elif cmd == 'stop':
+                common.executeJSONRPCMetchod('Player.Stop')
+            elif cmd == 'next':
+                common.executeJSONRPCMetchod('Player.GoTo', {'to': 'next'})
 
-            if len(result) > 0:
-                playerId = result[0]['playerid']
+        # Action on phone call
+        # Works only with com.android.dialer (Android stock dialer)
+        if self.cmdOnPhoneCallPush != 'none' and message.get('package_name', '') in ['com.android.dialer']:
 
-                if cmd == 'pause':
-                    common.executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.PlayPause", "params": { "playerid":' + str(playerId) + '}, "id": 1}')
-                elif cmd == 'stop':
-                    common.executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.Stop", "params": { "playerid":' + str(playerId) + '}, "id": 1}')
-                elif cmd == 'next':
-                    common.executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GoTo", "params": { "playerid":' + str(playerId) + ', "to": "next"}, "id": 1}')
+            common.log('Execute action on phone call end (dismiss): %s' % self.cmdOnPhoneCallPush)
+
+            if self.cmdOnPhoneCallPush == 'pause':
+                common.executeJSONRPCMetchod('Player.PlayPause', {'play': True})
+
+    def _onMirrorPush(self, message):
+
+        if 'icon' in message:
+            # BUILD KODI NOTIFICATION
+            applicationNameMirrored = message.get('application_name', '')
+            titleMirrored = message.get('title', '')
+
+            # Add Title...
+            title = applicationNameMirrored if not titleMirrored else applicationNameMirrored + ': '
+            title += titleMirrored
+
+            # ...Body...
+            body = message.get('body', '').rstrip('\n').replace('\n', ' / ')
+
+            # ...and Icon
+            iconPath = common.base64ToFile(message['icon'], self.imgFilePath, imgFormat='JPEG', imgSize=(96, 96))
+
+            common.showNotification(title, body, self.notificationTime, iconPath)
+
+            # Action on phone call
+            # Works only with com.android.dialer (Android stock dialer)
+            if self.cmdOnPhoneCallPush != 'none' and message.get('package_name', '') in ['com.android.dialer']:
+
+                common.log('Execute action on phone call start (mirror): %s' % self.cmdOnPhoneCallPush)
+
+                if self.cmdOnPhoneCallPush == 'pause':
+                    common.executeJSONRPCMetchod('Player.PlayPause', {'play': False})
+                elif self.cmdOnPhoneCallPush == 'stop':
+                    common.executeJSONRPCMetchod('Player.Stop')
 
     def onError(self, error):
         common.log(error, xbmc.LOGERROR)
@@ -224,3 +244,6 @@ class Push2Notification():
 
     def setCmdOnDismissPush(self, cmdOnDismissPush):
         self.cmdOnDismissPush = cmdOnDismissPush
+
+    def setCmdOnPhoneCallPush(self, cmdOnPhoneCallPush):
+        self.cmdOnPhoneCallPush = cmdOnPhoneCallPush

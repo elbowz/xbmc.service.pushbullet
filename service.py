@@ -121,6 +121,7 @@ class Service:
         self.push2Notification.setNotificationTime(self.stg_notificationTime*1000)
         common.showNotification.proportionalTextLengthTimeout = self.stg_propotificationTime
         self.push2Notification.setCmdOnDismissPush(self.stg_cmdOnDismissPush.lower())
+        self.push2Notification.setCmdOnPhoneCallPush(self.stg_cmdOnPhoneCallPush.lower())
 
         # outbound mirroring
         if self.stg_pbMirroringOut:
@@ -169,6 +170,7 @@ class Service:
         elif self.stg_pbMirroringOut != (__addon__.getSetting('pb_mirroring_out') == 'true'): return True
         elif self.stg_pbMirroringOutMediaNfo != (__addon__.getSetting('pb_mirroring_out_media_nfo') == 'true'): return True
         elif self.stg_cmdOnDismissPush != __addon__.getSetting('cmd_on_dismiss_push'): return True
+        elif self.stg_cmdOnPhoneCallPush != __addon__.getSetting('cmd_on_phone_call_push'): return True
 
         # ignore read only settings (pb_client_iden, pb_client_nickname, pb_client_model)
 
@@ -189,6 +191,7 @@ class Service:
         self.stg_pbMirroringOut         = __addon__.getSetting('pb_mirroring_out') == 'true'
         self.stg_pbMirroringOutMediaNfo = __addon__.getSetting('pb_mirroring_out_media_nfo') == 'true'
         self.stg_cmdOnDismissPush       = __addon__.getSetting('cmd_on_dismiss_push')
+        self.stg_cmdOnPhoneCallPush       = __addon__.getSetting('cmd_on_phone_call_push')
 
         # read only settings
         self.stg_pbClientIden           = __addon__.getSetting('pb_client_iden')

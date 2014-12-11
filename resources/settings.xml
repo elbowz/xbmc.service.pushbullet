@@ -36,6 +36,7 @@
         <setting id="ephmeral_test_action" label="30052" type="action" action="RunScript(service.pushbullet,SEND_EPHEMERAL_TEST)" />
         <setting label="30011" type="lsep"/>
         <setting id="cmd_on_dismiss_push" label="30053" type="labelenum" values="Stop|Pause|Next|None" default="Stop" enable="eq(-3,true)"/>
+        <setting id="cmd_on_phone_call_push" label="30054" type="labelenum" values="Stop|Pause|None" default="Pause" enable="eq(-5,true)"/>
     </category>
     <category label="32003">
         <setting id="load_video_thumbs" type="bool" default="false" label="32011" />
