@@ -1,5 +1,6 @@
 0.8.20b
 - Added playback action (play, pause) on incoming phone call
+- Fix for bug cause by changes in youtube-dl module
 
 0.8.18b
 - Fix regression on mirrored notification title (https://github.com/elbowz/xbmc.service.pushbullet/issues/20)
