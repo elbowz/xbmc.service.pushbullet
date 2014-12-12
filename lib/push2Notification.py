@@ -109,11 +109,11 @@ class Push2Notification():
             common.log('Execute action on dismiss push: %s' % cmd)
 
             if cmd == 'pause':
-                common.executeJSONRPCMetchod('Player.PlayPause')
+                common.executeJSONRPCMethod('Player.PlayPause')
             elif cmd == 'stop':
-                common.executeJSONRPCMetchod('Player.Stop')
+                common.executeJSONRPCMethod('Player.Stop')
             elif cmd == 'next':
-                common.executeJSONRPCMetchod('Player.GoTo', {'to': 'next'})
+                common.executeJSONRPCMethod('Player.GoTo', {'to': 'next'})
 
         # Action on phone call
         # Works only with com.android.dialer (Android stock dialer)
@@ -122,7 +122,7 @@ class Push2Notification():
             common.log('Execute action on phone call end (dismiss): %s' % self.cmdOnPhoneCallPush)
 
             if self.cmdOnPhoneCallPush == 'pause':
-                common.executeJSONRPCMetchod('Player.PlayPause', {'play': True})
+                common.executeJSONRPCMethod('Player.PlayPause', {'play': True})
 
     def _onMirrorPush(self, message):
 
@@ -150,9 +150,9 @@ class Push2Notification():
                 common.log('Execute action on phone call start (mirror): %s' % self.cmdOnPhoneCallPush)
 
                 if self.cmdOnPhoneCallPush == 'pause':
-                    common.executeJSONRPCMetchod('Player.PlayPause', {'play': False})
+                    common.executeJSONRPCMethod('Player.PlayPause', {'play': False})
                 elif self.cmdOnPhoneCallPush == 'stop':
-                    common.executeJSONRPCMetchod('Player.Stop')
+                    common.executeJSONRPCMethod('Player.Stop')
 
     def onError(self, error):
         common.log(error, xbmc.LOGERROR)

@@ -51,7 +51,7 @@ def executeJSONRPC(jsonStr):
 
     return response
 
-def executeJSONRPCMetchod(method, params={}):
+def executeJSONRPCMethod(method, params={}):
 
     rpc = {
         'jsonrpc': '2.0',
