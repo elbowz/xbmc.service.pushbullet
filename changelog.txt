@@ -1,3 +1,6 @@
+0.8.22a
+- Rename executeJSONRPCMetchod to executeJSONRPCMethod
+
 0.8.20b
 - Added playback action (play, pause) on incoming phone call
 - Fix for bug cause by changes in youtube-dl module
