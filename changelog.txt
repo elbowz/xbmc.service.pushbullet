@@ -1,5 +1,6 @@
 0.8.22b
 - Added auto dismiss pushes on setting (issue #22)
+- Proportional notifications timeout use notification delay as max value
 
 0.8.22a
 - Rename executeJSONRPCMetchod to executeJSONRPCMethod

@@ -33,7 +33,7 @@ def traceError():
 
 def showNotification(title, message, timeout=2000, icon=__addonicon__):
     if showNotification.proportionalTextLengthTimeout:
-        timeout = len(message)/10*2000
+        timeout = min(len(message)/10*2000, timeout)
 
     title = title.replace('"', '\\"')
     message = message.replace('"', '\\"')
