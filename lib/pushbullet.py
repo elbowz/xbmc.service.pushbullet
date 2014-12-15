@@ -11,7 +11,8 @@ class Pushbullet():
 
     def __init__(self, access_token=None, user_iden=None, device_iden=None, filter_deny={}, filter_allow={},
                  mirror_mode=True, view_channels = True, base_url='https://api.pushbullet.com/v2/', ping_timeout=6,
-                 try_reconnect=10, json_format_response=True, last_modified=0, last_modified_callback=None, log_callback=None):
+                 try_reconnect=10, json_format_response=True, last_modified=0, last_modified_callback=None, autodismiss_pushes=False,
+                 log_callback=None):
         """
         access_token: access toke.
         user_iden; used for send and receive ephemerals (if not set receive all pushes)
@@ -39,6 +40,7 @@ class Pushbullet():
         self.try_reconnect = try_reconnect
         self.json_format_response = json_format_response
         self._last_modified_callback = last_modified_callback
+        self.autodismiss_pushes = autodismiss_pushes;
         self._log_callback = log_callback
 
         self._h = httplib2.Http()
@@ -308,7 +310,8 @@ class Pushbullet():
         elif data['type'] == 'tickle' and data['subtype'] == 'push':
             for push in self.getPushes():
                 if self._user_on_message(push):
-                    self.dismissPush(push['iden'])
+                    if self.autodismiss_pushes:
+                        self.dismissPush(push['iden'])
 
     def _on_close(self, websocket):
         self._user_on_close()
@@ -419,6 +422,12 @@ class Pushbullet():
         Set mirror_mode
         """
         self.mirror_mode = mirror_mode
+
+    def setAutodismissPushes(self, autodismiss_pushes):
+        """
+        Set view_channels
+        """
+        self.autodismiss_pushes = autodismiss_pushes
 
     def setViewChannels(self, view_channels):
         """

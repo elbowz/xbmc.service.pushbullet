@@ -12,7 +12,8 @@
     <category label="30000">
         <setting id="notification_time" label="30031" type="slider" default="6" range="1,1,60" option="int" enable="eq(1,false)"/>
         <setting id="proportional_notification_time" label="30032" type="bool" default="true"/>
-        <setting id="pb_channels" label="30033" type="bool" default="true"/>
+        <setting id="autodismiss_pushes" label="30033" type="bool" default="false"/>
+        <setting id="pb_channels" label="30034" type="bool" default="true"/>
     </category>
     <category label="32107">
         <setting label="32114" type="lsep"/>

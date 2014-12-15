@@ -61,6 +61,10 @@ msgid "Proportional notifications timeout"
 msgstr ""
 
 msgctxt "#30033"
+msgid "Auto dismiss pushes when arrived"
+msgstr ""
+
+msgctxt "#30034"
 msgid "View Channels"
 msgstr ""
 

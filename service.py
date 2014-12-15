@@ -115,6 +115,7 @@ class Service:
         self.pushbullet.setFilterDeny({'application_name': self.stg_pbFilterDeny.split()})
         self.pushbullet.setFilterAllow({'application_name': self.stg_pbFilterAllow.split()})
         self.pushbullet.setMirrorMode(self.stg_pbMirroring)
+        self.pushbullet.setAutodismissPushes(self.stg_autodismissPushes)
         self.pushbullet.setViewChannels(self.stg_pbChannels)
 
         # setup service
@@ -162,6 +163,7 @@ class Service:
     def _isSettingChanged(self):
         if self.stg_notificationTime != int(__addon__.getSetting('notification_time')): return True
         elif self.stg_propotificationTime != (__addon__.getSetting('proportional_notification_time') == 'true'): return True
+        elif self.stg_autodismissPushes != (__addon__.getSetting('autodismiss_pushes') == 'true'): return True
         elif self.stg_pbClientIden != __addon__.getSetting('pb_client_iden'): return True
         elif self.stg_pbChannels != (__addon__.getSetting('pb_channels') == 'true'): return True
         elif self.stg_pbMirroring != (__addon__.getSetting('pb_mirroring') == 'true'): return True
@@ -182,6 +184,7 @@ class Service:
         self.stg_pbAccessToken          = __addon__.getSetting('pb_access_token')
         self.stg_notificationTime       = int(__addon__.getSetting('notification_time'))
         self.stg_propotificationTime    = __addon__.getSetting('proportional_notification_time') == 'true'
+        self.stg_autodismissPushes             = __addon__.getSetting('autodismiss_pushes') == 'true'
         self.stg_pbChannels             = __addon__.getSetting('pb_channels') == 'true'
 
         self.stg_pbMirroring            = __addon__.getSetting('pb_mirroring') == 'true'
