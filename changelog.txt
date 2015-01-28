@@ -1,5 +1,8 @@
+0.8.24a
+- Fixed notification character set encoding UTF-8 (#23)
+
 0.8.22
--Official repository release
+- Official repository release
 
 0.8.22b
 - Added auto dismiss pushes on setting (issue #22)
