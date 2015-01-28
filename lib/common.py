@@ -39,7 +39,7 @@ def showNotification(title, message, timeout=2000, icon=__addonicon__):
     message = message.replace('"', '\\"')
 
     xbmc.executebuiltin('Notification("%s","%s","%s","%s")' % (
-        title.encode('ascii', 'ignore'), message.encode('ascii', 'ignore'), timeout, icon))
+        title.encode('utf-8', 'ignore'), message.encode('utf-8', 'ignore'), timeout, icon))
 showNotification.proportionalTextLengthTimeout = False
 
 
