@@ -198,9 +198,21 @@ def fileTobase64(filePath, imgFormat='JPEG', imgSize=None):
 
     return imgEncoded
 
+#waitForAbort override function for xbmc.Monitor for pre-helix
+def waitForAbort(sec_float=0):
+    if sec_float:
+        ms = sec_float * 1000
+        ct=0
+        while not xbmc.abortRequested and ct < ms:
+            xbmc.sleep(100)
+            ct+=100
+    else:
+        while not xbmc.abortRequested:
+            xbmc.sleep(100)
 
 class serviceMonitor(xbmc.Monitor):
     def __init__(self, onSettingsChangedAction=None, onNotificationAction=None):
+        if not hasattr(self,'waitForAbort'): self.waitForAbort = waitForAbort #For pre-Helix
         xbmc.Monitor.__init__(self)
 
         self.onSettingsChangedAction = onSettingsChangedAction

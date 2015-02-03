@@ -51,8 +51,7 @@ class Service:
         self._getSettings()
         self.run()
 
-        while not xbmc.abortRequested:
-            xbmc.sleep(200)
+        self.serviceMonitor.waitForAbort()
 
         common.log('Closing socket (waiting...)')
 

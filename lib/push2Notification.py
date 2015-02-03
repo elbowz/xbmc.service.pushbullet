@@ -57,10 +57,9 @@ class Push2Notification():
             common.log(' '.join(str(arg) for arg in ex.args), xbmc.LOGERROR)
 
     def _onMessageLink(self, message):
-        if pushhandler.canHandle(message):
-            self.handleMediaPush(mediaType, message)
-        else:
-            self.showNotificationFromMessage(message)
+        mediaType = pushhandler.canHandle(message)
+        if not mediaType: return False
+        return self.handleMediaPush(mediaType,message)
 
     def _onMessageFile(self, message):
         mediaType = pushhandler.canHandle(message)
