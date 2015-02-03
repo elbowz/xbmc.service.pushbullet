@@ -1,3 +1,6 @@
+0.8.24b
+- Improve and fix showNotificationFromMessage and view link on notification if not handled (#24)
+
 0.8.24a
 - Fixed notification character set encoding UTF-8 (#23)
 

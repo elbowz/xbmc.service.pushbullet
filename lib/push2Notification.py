@@ -57,9 +57,10 @@ class Push2Notification():
             common.log(' '.join(str(arg) for arg in ex.args), xbmc.LOGERROR)
 
     def _onMessageLink(self, message):
-        mediaType = pushhandler.canHandle(message)
-        if not mediaType: return False
-        return self.handleMediaPush(mediaType,message)
+        if pushhandler.canHandle(message):
+            self.handleMediaPush(mediaType, message)
+        else:
+            self.showNotificationFromMessage(message)
 
     def _onMessageFile(self, message):
         mediaType = pushhandler.canHandle(message)
@@ -69,10 +70,10 @@ class Push2Notification():
     def _onMessageNote(self, message):
         if not self.executeKodiCmd(message):
             # Show instantly if enabled
-            if common.getSetting('handling_note',0) == 0 and pushhandler.canHandle(message):
+            if common.getSetting('handling_note', 0) == 0 and pushhandler.canHandle(message):
                 pushhandler.handlePush(message)
             # else show notification if enabled
-            elif common.getSetting('handling_note',0) == 1:
+            elif common.getSetting('handling_note', 0) == 1:
                 self.showNotificationFromMessage(message)
             else:
                 return False
@@ -80,9 +81,9 @@ class Push2Notification():
 
     def _onMessageAddress(self, message):
         # Show instantly if enabled
-        if common.getSetting('handling_address',0) == 0 and pushhandler.canHandle(message):
+        if common.getSetting('handling_address', 0) == 0 and pushhandler.canHandle(message):
             pushhandler.handlePush(message)
-        elif common.getSetting('handling_address',0) == 1:
+        elif common.getSetting('handling_address', 0) == 1:
             self.showNotificationFromMessage(message)
         else:
             return False
@@ -164,11 +165,38 @@ class Push2Notification():
     def onOpen(self):
         common.log('Socket opened')
 
-    def showNotificationFromMessage(self,message):
-        title = message.get('title',message.get('name',message.get('file_name',''))) or message.get('url','').rsplit('/',1)[-1]
-        body = message.get('body',message.get('address','')).replace("\n", " / ")
+    def showNotificationFromMessage(self, message):
+
+        # Field title priority
+        if 'title' in message:
+            title = message['title']
+        elif 'name' in message:
+            title = message['name']
+        elif 'file_name' in message:
+            title = message['file_name']
+        elif 'name' in message:
+            title = message['name']
+        elif 'url' in message:
+            title = message['url'].rsplit('/', 1)[-1]
+        elif 'channel_iden' in message:
+            title = 'channel'
+        else:
+            title = ' '
+
+        # Field body priority
+        if 'body' in message:
+            body = message['body']
+        elif 'address' in message:
+            body = message['address']
+        elif 'url' in message:
+            body = message['url']
+        else:
+            body = ' '
+
+        body.replace("\n", " / ")
+
         if not body and message['type'] == 'list':
-            body = '{0} items'.format(len(message.get('items',[])))
+            body = '{0} items'.format(len(message.get('items', [])))
 
         common.showNotification(title, body, self.notificationTime, self.notificationIcon)
 
