@@ -118,6 +118,7 @@ def getKodiCmdsFromFiles():
 
 
 def base64ToFile(strBase64, filePath, imgFormat='JPEG', imgSize=None):
+    if not strBase64: return None
     import base64
     fileDecoded = base64.b64decode(strBase64)
 

@@ -1,3 +1,8 @@
+0.8.26b
+- Added a push handling setting for links (Default: Show notification)
+- If enabled, link pushes now show notification if not handled as media (#24)
+- Fixes for null push fields causing errors
+
 0.8.24b
 - Improve and fix showNotificationFromMessage and view link on notification if not handled (#24)
 

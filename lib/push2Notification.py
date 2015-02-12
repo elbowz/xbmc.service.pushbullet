@@ -58,8 +58,10 @@ class Push2Notification():
 
     def _onMessageLink(self, message):
         mediaType = pushhandler.canHandle(message)
-        if not mediaType: return False
-        return self.handleMediaPush(mediaType,message)
+        if mediaType:
+            return self.handleMediaPush(mediaType,message)
+        elif common.getSetting('handling_link', 0) == 0:
+            self.showNotificationFromMessage(message)
 
     def _onMessageFile(self, message):
         mediaType = pushhandler.canHandle(message)
@@ -69,10 +71,10 @@ class Push2Notification():
     def _onMessageNote(self, message):
         if not self.executeKodiCmd(message):
             # Show instantly if enabled
-            if common.getSetting('handling_note', 0) == 0 and pushhandler.canHandle(message):
+            if common.getSetting('handling_note', 1) == 0 and pushhandler.canHandle(message):
                 pushhandler.handlePush(message)
             # else show notification if enabled
-            elif common.getSetting('handling_note', 0) == 1:
+            elif common.getSetting('handling_note', 1) == 1:
                 self.showNotificationFromMessage(message)
             else:
                 return False
@@ -80,9 +82,9 @@ class Push2Notification():
 
     def _onMessageAddress(self, message):
         # Show instantly if enabled
-        if common.getSetting('handling_address', 0) == 0 and pushhandler.canHandle(message):
+        if common.getSetting('handling_address', 1) == 0 and pushhandler.canHandle(message):
             pushhandler.handlePush(message)
-        elif common.getSetting('handling_address', 0) == 1:
+        elif common.getSetting('handling_address', 1) == 1:
             self.showNotificationFromMessage(message)
         else:
             return False
@@ -90,9 +92,9 @@ class Push2Notification():
 
     def _onMessageList(self, message):
         # Show instantly if enabled
-        if common.getSetting('handling_list',0) == 0 and pushhandler.canHandle(message):
+        if common.getSetting('handling_list', 1) == 0 and pushhandler.canHandle(message):
             pushhandler.handlePush(message)
-        elif common.getSetting('handling_list',0) == 1:
+        elif common.getSetting('handling_list', 1) == 1:
             self.showNotificationFromMessage(message)
         else:
             return False
@@ -132,11 +134,10 @@ class Push2Notification():
             titleMirrored = message.get('title', '')
 
             # Add Title...
-            title = applicationNameMirrored if not titleMirrored else applicationNameMirrored + ': '
-            title += titleMirrored
+            title = applicationNameMirrored if not titleMirrored else (applicationNameMirrored + ': ' + titleMirrored)
 
             # ...Body...
-            body = message.get('body', '').rstrip('\n').replace('\n', ' / ')
+            body = (message.get('body') or '').rstrip('\n').replace('\n', ' / ')
 
             # ...and Icon
             iconPath = common.base64ToFile(message['icon'], self.imgFilePath, imgFormat='JPEG', imgSize=(96, 96))

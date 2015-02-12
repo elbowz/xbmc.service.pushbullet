@@ -496,3 +496,7 @@ msgstr ""
 msgctxt "#32121"
 msgid "Enable Debug Logging"
 msgstr ""
+
+msgctxt "#32122"
+msgid "Link"
+msgstr ""
