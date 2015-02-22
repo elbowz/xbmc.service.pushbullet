@@ -107,7 +107,7 @@ class Push2Notification():
         {"notification_id": 1812, "package_name": "com.podkicker", "notification_tag": null,
         "source_user_iden": "ujy9SIuzSFw", "source_device_iden": "ujy9SIuzSFwsjzWIEVDzOK", "type": "dismissal"}
         """
-        if message['notification_id'] == self.pbPlaybackNotificationId:
+        if int(message['notification_id']) == self.pbPlaybackNotificationId:
             common.log('Execute action on dismiss push: %s' % cmd)
 
             if cmd == 'pause':
@@ -145,8 +145,11 @@ class Push2Notification():
             common.showNotification(title, body, self.notificationTime, iconPath)
 
             # Action on phone call
-            # Works only with com.android.dialer (Android stock dialer)
-            if self.cmdOnPhoneCallPush != 'none' and message.get('package_name', '') in ['com.android.dialer']:
+            # Works only with com.android.dialer (Android stock dialer)...for now
+            # Add others dialer packages in the list
+            dialerPackage = ['com.android.dialer']
+
+            if self.cmdOnPhoneCallPush != 'none' and message.get('package_name', '') in dialerPackage:
 
                 common.log('Execute action on phone call start (mirror): %s' % self.cmdOnPhoneCallPush)
 

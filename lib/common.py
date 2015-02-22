@@ -33,13 +33,14 @@ def traceError():
 
 def showNotification(title, message, timeout=2000, icon=__addonicon__):
     if showNotification.proportionalTextLengthTimeout:
-        timeout = min(len(message)/10*2000, timeout)
+        timeout = min(len(message) / 10 * 2000, timeout)
 
     title = title.replace('"', '\\"')
     message = message.replace('"', '\\"')
 
     xbmc.executebuiltin('Notification("%s","%s","%s","%s")' % (
         title.encode('utf-8', 'ignore'), message.encode('utf-8', 'ignore'), timeout, icon))
+
 showNotification.proportionalTextLengthTimeout = False
 
 

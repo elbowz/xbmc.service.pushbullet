@@ -1,22 +1,19 @@
+0.8.26c
+- Fixed action on media notification is dismissed on device
+
 0.8.26b
 - Added a push handling setting for links (Default: Show notification)
 - If enabled, link pushes now show notification if not handled as media (#24)
 - Fixes for null push fields causing errors
 
-0.8.24b
+0.8.24
 - Improve and fix showNotificationFromMessage and view link on notification if not handled (#24)
-
-0.8.24a
 - Fixed notification character set encoding UTF-8 (#23)
 
 0.8.22
 - Official repository release
-
-0.8.22b
 - Added auto dismiss pushes on setting (issue #22)
 - Proportional notifications timeout use notification delay as max value
-
-0.8.22a
 - Rename executeJSONRPCMetchod to executeJSONRPCMethod
 
 0.8.20b
