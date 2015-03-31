@@ -1,4 +1,4 @@
-0.8.26c
+0.8.26b2
 - Fixed action on media notification is dismissed on device
 
 0.8.26b
