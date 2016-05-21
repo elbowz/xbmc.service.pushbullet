@@ -251,14 +251,14 @@ class Service:
 
                     elif data['item']['type'] == 'episode':
                         title = result['item']['title']
-                        body = '%s %sx%s' % (result['item']['showtitle'], result['item']['episode'], result['item']['season'])
+                        body = '%s %sx%s' % (result['item']['showtitle'], result['item']['season'], result['item']['episode'])
 
                     elif data['item']['type'] == 'channel':
                         title = result['item']['title']
                         body = '%s - %s (%s)' % (result['item']['channelnumber'], result['item']['channel'], result['item']['channeltype'], )
 
                     else:
-                        title = result['item']['label'] if 'label' in result['item'] else result['item']['file']
+                        title = result['item'].get('label') or result['item'].get('title') or result['item'].get('file') or ''
                         body = None
 
                     thumbnailFilePath = None
