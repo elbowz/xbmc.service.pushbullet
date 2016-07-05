@@ -5,14 +5,15 @@ import xbmc
 
 from lib import common
 
-__addon__        = common.__addon__
-__addonid__      = common.__addonid__
+__addon__ = common.__addon__
+__addonid__ = common.__addonid__
 __addonversion__ = common.__addonversion__
-__addonname__    = common.__addonname__
-__addonauthor__  = common.__addonauthor__
-__addonpath__    = common.__addonpath__
+__addonname__ = common.__addonname__
+__addonauthor__ = common.__addonauthor__
+__addonpath__ = common.__addonpath__
 __addonprofile__ = common.__addonprofile__
-__addonicon__    = common.__addonicon__
+__addonicon__ = common.__addonicon__
+
 
 class Service:
     def __init__(self):
@@ -55,7 +56,8 @@ class Service:
 
         common.log('Closing socket (waiting...)')
 
-        if self.pushbullet: self.pushbullet.close()
+        if self.pushbullet:
+            self.pushbullet.close()
 
         common.log('Service closed')
 
@@ -75,11 +77,11 @@ class Service:
             from lib.pushbullet import Pushbullet
 
             # init pushbullet
-            self.pushbullet = Pushbullet(   access_token=self.stg_pbAccessToken,
-                                            ping_timeout=6,
-                                            last_modified=common.getSetting('last_modified',0),
-                                            last_modified_callback=self.setLastModified,
-                                            log_callback=common.log)
+            self.pushbullet = Pushbullet(access_token=self.stg_pbAccessToken,
+                                         ping_timeout=6,
+                                         last_modified=common.getSetting('last_modified', 0),
+                                         last_modified_callback=self.setLastModified,
+                                         log_callback=common.log)
 
             # get device info (also if edited by user on Pushbullet panel)
             self._getDevice()
@@ -102,8 +104,8 @@ class Service:
             common.log(message, xbmc.LOGERROR)
             common.showNotification(common.localise(30101), message, self.serviceNotifcationTime)
 
-    def setLastModified(self,modified):
-        common.setSetting('last_modified','{0:10f}'.format(modified))
+    def setLastModified(self, modified):
+        common.setSetting('last_modified', '{0:10f}'.format(modified))
         common.log('Updating last_modified: {0}'.format(modified))
 
     def _setupService(self):
@@ -118,7 +120,7 @@ class Service:
         self.pushbullet.setViewChannels(self.stg_pbChannels)
 
         # setup service
-        self.push2Notification.setNotificationTime(self.stg_notificationTime*1000)
+        self.push2Notification.setNotificationTime(self.stg_notificationTime * 1000)
         common.showNotification.proportionalTextLengthTimeout = self.stg_propotificationTime
         self.push2Notification.setCmdOnDismissPush(self.stg_cmdOnDismissPush.lower())
         self.push2Notification.setCmdOnPhoneCallPush(self.stg_cmdOnPhoneCallPush.lower())
@@ -160,18 +162,30 @@ class Service:
                 self._setupService()
 
     def _isSettingChanged(self):
-        if self.stg_notificationTime != int(__addon__.getSetting('notification_time')): return True
-        elif self.stg_propotificationTime != (__addon__.getSetting('proportional_notification_time') == 'true'): return True
-        elif self.stg_autodismissPushes != (__addon__.getSetting('autodismiss_pushes') == 'true'): return True
-        elif self.stg_pbClientIden != __addon__.getSetting('pb_client_iden'): return True
-        elif self.stg_pbChannels != (__addon__.getSetting('pb_channels') == 'true'): return True
-        elif self.stg_pbMirroring != (__addon__.getSetting('pb_mirroring') == 'true'): return True
-        elif self.stg_pbFilterDeny != __addon__.getSetting('pb_filter_deny'): return True
-        elif self.stg_pbFilterAllow != __addon__.getSetting('pb_filter_allow'): return True
-        elif self.stg_pbMirroringOut != (__addon__.getSetting('pb_mirroring_out') == 'true'): return True
-        elif self.stg_pbMirroringOutMediaNfo != (__addon__.getSetting('pb_mirroring_out_media_nfo') == 'true'): return True
-        elif self.stg_cmdOnDismissPush != __addon__.getSetting('cmd_on_dismiss_push'): return True
-        elif self.stg_cmdOnPhoneCallPush != __addon__.getSetting('cmd_on_phone_call_push'): return True
+        if self.stg_notificationTime != int(__addon__.getSetting('notification_time')):
+            return True
+        elif self.stg_propotificationTime != (__addon__.getSetting('proportional_notification_time') == 'true'):
+            return True
+        elif self.stg_autodismissPushes != (__addon__.getSetting('autodismiss_pushes') == 'true'):
+            return True
+        elif self.stg_pbClientIden != __addon__.getSetting('pb_client_iden'):
+            return True
+        elif self.stg_pbChannels != (__addon__.getSetting('pb_channels') == 'true'):
+            return True
+        elif self.stg_pbMirroring != (__addon__.getSetting('pb_mirroring') == 'true'):
+            return True
+        elif self.stg_pbFilterDeny != __addon__.getSetting('pb_filter_deny'):
+            return True
+        elif self.stg_pbFilterAllow != __addon__.getSetting('pb_filter_allow'):
+            return True
+        elif self.stg_pbMirroringOut != (__addon__.getSetting('pb_mirroring_out') == 'true'):
+            return True
+        elif self.stg_pbMirroringOutMediaNfo != (__addon__.getSetting('pb_mirroring_out_media_nfo') == 'true'):
+            return True
+        elif self.stg_cmdOnDismissPush != __addon__.getSetting('cmd_on_dismiss_push'):
+            return True
+        elif self.stg_cmdOnPhoneCallPush != __addon__.getSetting('cmd_on_phone_call_push'):
+            return True
 
         # ignore read only settings (pb_client_iden, pb_client_nickname, pb_client_model)
 
@@ -180,25 +194,25 @@ class Service:
     def _getSettings(self):
         common.log('Reading settings')
 
-        self.stg_pbAccessToken          = __addon__.getSetting('pb_access_token')
-        self.stg_notificationTime       = int(__addon__.getSetting('notification_time'))
-        self.stg_propotificationTime    = __addon__.getSetting('proportional_notification_time') == 'true'
-        self.stg_autodismissPushes             = __addon__.getSetting('autodismiss_pushes') == 'true'
-        self.stg_pbChannels             = __addon__.getSetting('pb_channels') == 'true'
+        self.stg_pbAccessToken = __addon__.getSetting('pb_access_token')
+        self.stg_notificationTime = int(__addon__.getSetting('notification_time'))
+        self.stg_propotificationTime = __addon__.getSetting('proportional_notification_time') == 'true'
+        self.stg_autodismissPushes = __addon__.getSetting('autodismiss_pushes') == 'true'
+        self.stg_pbChannels = __addon__.getSetting('pb_channels') == 'true'
 
-        self.stg_pbMirroring            = __addon__.getSetting('pb_mirroring') == 'true'
-        self.stg_pbFilterDeny           = __addon__.getSetting('pb_filter_deny')
-        self.stg_pbFilterAllow          = __addon__.getSetting('pb_filter_allow')
+        self.stg_pbMirroring = __addon__.getSetting('pb_mirroring') == 'true'
+        self.stg_pbFilterDeny = __addon__.getSetting('pb_filter_deny')
+        self.stg_pbFilterAllow = __addon__.getSetting('pb_filter_allow')
 
-        self.stg_pbMirroringOut         = __addon__.getSetting('pb_mirroring_out') == 'true'
+        self.stg_pbMirroringOut = __addon__.getSetting('pb_mirroring_out') == 'true'
         self.stg_pbMirroringOutMediaNfo = __addon__.getSetting('pb_mirroring_out_media_nfo') == 'true'
-        self.stg_cmdOnDismissPush       = __addon__.getSetting('cmd_on_dismiss_push')
-        self.stg_cmdOnPhoneCallPush       = __addon__.getSetting('cmd_on_phone_call_push')
+        self.stg_cmdOnDismissPush = __addon__.getSetting('cmd_on_dismiss_push')
+        self.stg_cmdOnPhoneCallPush = __addon__.getSetting('cmd_on_phone_call_push')
 
         # read only settings
-        self.stg_pbClientIden           = __addon__.getSetting('pb_client_iden')
-        self.stg_pbClientNickname       = __addon__.getSetting('pb_client_nickname')
-        self.stg_pbClientModel          = __addon__.getSetting('pb_client_model')
+        self.stg_pbClientIden = __addon__.getSetting('pb_client_iden')
+        self.stg_pbClientNickname = __addon__.getSetting('pb_client_nickname')
+        self.stg_pbClientModel = __addon__.getSetting('pb_client_model')
 
     def _getDevice(self):
         device = self.pushbullet.getDevice(self.stg_pbClientIden)
@@ -206,11 +220,11 @@ class Service:
         if device:
             # set setting
             __addon__.setSetting(id='pb_client_nickname', value=device['nickname'])
-            __addon__.setSetting(id='pb_client_model', value=device.get('model','')) # use .get() as model may not be set
+            __addon__.setSetting(id='pb_client_model', value=device.get('model', ''))  # use .get() as model may not be set
 
             # update vars setting
             self.stg_pbClientNickname = __addon__.getSetting('pb_client_nickname')
-            self.stg_pbClientModel  = __addon__.getSetting('pb_client_model')
+            self.stg_pbClientModel = __addon__.getSetting('pb_client_model')
 
             common.log('Device %s (%s) found e loaded' % (self.stg_pbClientNickname, self.stg_pbClientModel))
         else:
@@ -232,30 +246,49 @@ class Service:
                 if playerId < 0:
                     result = data
                 else:
-                    result = common.executeJSONRPC('{"jsonrpc": "2.0", "method": "Player.GetItem", "params": { "properties": ["title","year","tagline","album","artist","plot","episode","season","showtitle","channel","channeltype","channelnumber","thumbnail","file"], "playerid": ' + str(playerId) + ' }, "id": "1"}')
+                    result = common.executeJSONRPC(
+                        '{"jsonrpc": "2.0", "method": "Player.GetItem", ' +
+                        '"params": { "properties": ["title","year","tagline","album","artist","plot","episode","season",' +
+                        '"showtitle","channel","channeltype","channelnumber","thumbnail","file"],' +
+                        ' "playerid": ' + str(playerId) + ' }, "id": "1"}'
+                    )
 
                 if 'item' in result:
                     if data['item']['type'] == 'movie':
                         if 'title' in result['item'] and result['item']['title'] != '':
-                            title = '%s (%s)' % (result['item']['title'], result['item'].get('year',''))
-                            body = result['item'].get('tagline',xbmc.getInfoLabel('VideoPlayer.Tagline'))
+                            title = '%s (%s)' % (
+                                result['item']['title'],
+                                result['item'].get('year', '')
+                            )
+                            body = result['item'].get('tagline', xbmc.getInfoLabel('VideoPlayer.Tagline'))
 
                     elif data['item']['type'] == 'song' or data['item']['type'] == 'musicvideo':
                         if 'title' in result['item'] and result['item']['title'] != '':
-                            title = result['item']['title']
-                            body = '%s / %s' % (result['item']['album'], ', '.join(result['item']['artist']))
+                            title = result['item'].get('title', '')
+                            body = '%s / %s' % (
+                                result['item'].get('album', ''),
+                                ', '.join(result['item'].get('artist', ''))
+                            )
 
                     elif data['item']['type'] == 'picture':
                         title = 'Picture'
-                        body = data['item']['file']
+                        body = data['item'].get('file', '')
 
                     elif data['item']['type'] == 'episode':
-                        title = result['item']['title']
-                        body = '%s %sx%s' % (result['item']['showtitle'], result['item']['season'], result['item']['episode'])
+                        title = result['item'].get('title', '')
+                        body = '%s %sx%s' % (
+                            result['item'].get('showtitle', ''),
+                            result['item'].get('season', ''),
+                            result['item'].get('episode', '')
+                        )
 
                     elif data['item']['type'] == 'channel':
-                        title = result['item']['title']
-                        body = '%s - %s (%s)' % (result['item']['channelnumber'], result['item']['channel'], result['item']['channeltype'], )
+                        title = result['item'].get('title', '')
+                        body = '%s - %s (%s)' % (
+                            result['item'].get('channelnumber', ''),
+                            result['item'].get('channel', ''),
+                            result['item'].get('channeltype', '')
+                        )
 
                     else:
                         title = result['item'].get('label') or result['item'].get('title') or result['item'].get('file') or ''
@@ -270,7 +303,8 @@ class Service:
                     if thumbnailFilePath:
                         try:
                             icon = common.fileTobase64(thumbnailFilePath, imgFormat='JPEG', imgSize=(72, 72))
-                            if not icon: raise Exception('No Icon')
+                            if not icon:
+                                raise Exception('No Icon')
                         except:
                             icon = self.xbmcImgEncoded
 
