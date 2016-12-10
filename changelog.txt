@@ -1,3 +1,7 @@
+0.8.30
+- Fixed issue on ssl connection: 'EOF occurred in violation of protocol (_ssl.c:590)' (#29)
+- Removed httplib2 in favour of requests lib
+
 0.8.26b2
 - Fixed action on media notification is dismissed on device
 

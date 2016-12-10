@@ -10,7 +10,6 @@ For set the Pushbullet *access token* as well as in the addon settings, you can 
 *userdata/addon_data/service.pushbullet/settings.xml*
 
 ### Features (TODOS)
-- [ ] Answer messages directly on Kodi
 - [ ] Catch others Kodi notification to send to other device (for Sync/Mirroring in outbound mode)
 
 ### www

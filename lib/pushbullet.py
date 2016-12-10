@@ -1,6 +1,6 @@
 import json
 
-import httplib2
+import requests
 import websocket
 import threading
 
@@ -43,8 +43,6 @@ class Pushbullet():
         self.autodismiss_pushes = autodismiss_pushes;
         self._log_callback = log_callback
 
-        self._h = httplib2.Http()
-        self._h.add_credentials(self.access_token, '')
 
         self._REST_URLS = {
             'pushes': 'pushes',
@@ -94,7 +92,7 @@ class Pushbullet():
         Get the current user information.
         """
 
-        self._response = self._h.request(self.base_url + self._REST_URLS['me'], method='GET')
+        self._response = requests.get(self.base_url + self._REST_URLS['me'], headers={'Access-Token': self.access_token})
 
         return self._getResponse(json_format_response=json_format_response)
 
@@ -102,8 +100,7 @@ class Pushbullet():
         """
         Get devices list.
         """
-
-        self._response = self._h.request(self.base_url + self._REST_URLS['devices'], method='GET')
+        self._response = requests.get(self.base_url + self._REST_URLS['devices'], headers={'Access-Token': self.access_token})
 
         return self._getResponse(json_format_response=json_format_response)
 
@@ -126,8 +123,9 @@ class Pushbullet():
 
         modified_after = self._last_modified if modified_after is 0 else modified_after
 
-        self._response = self._h.request(
-            self.base_url + self._REST_URLS['pushes'] + '?modified_after=' + (modified_after and '{0:10f}'.format(modified_after) or '0'), method='GET') # Modified after must be formated or it will be rounded to the nearest 1/100
+        self._response = requests.get(self.base_url + self._REST_URLS['pushes'],
+                                      params={'modified_after': (modified_after and '{0:10f}'.format(modified_after) or '0')}, # Modified after must be formated or it will be rounded to the nearest 1/100
+                                      headers={'Access-Token': self.access_token})
 
         pushes = self._getResponse(json_format_response=True)['pushes']
 
@@ -193,16 +191,18 @@ class Pushbullet():
 
         data = json.dumps(data)
 
-        self._response = self._h.request(self.base_url + self._REST_URLS['devices'], method='POST', body=data,
-                                         headers={'Content-Type': 'application/json'})
+        self._response = requests.post(self.base_url + self._REST_URLS['devices'],
+                                       data=data,
+                                       headers={'Access-Token': self.access_token, 'Content-Type': 'application/json'})
 
         return self._getResponse(json_format_response=json_format_response)
 
     def dismissPush(self, iden, json_format_response=None):
         data = json.dumps({'dismissed': True})
 
-        self._response = self._h.request(self.base_url + self._REST_URLS['pushes'] + '/' + str(iden), method='POST', body=data,
-                                         headers={'Content-Type': 'application/json'})
+        self._response = requests.post(self.base_url + self._REST_URLS['pushes'] + '/' + str(iden),
+                                      data=data,
+                                      headers={'Access-Token': self.access_token, 'Content-Type': 'application/json'})
 
         return self._getResponse(json_format_response=json_format_response)
 
@@ -211,11 +211,11 @@ class Pushbullet():
         json_format_response = self.json_format_response if json_format_response is None else json_format_response
 
         # response is not 200
-        if response[0].status != 200:
+        if response.status_code != requests.codes.ok:
             raise Exception('Pushbullet server response: (%d) %s' % (
-                response[0].status, json.loads(response[1])['error']['message']))
+                response.status_code, response.json()['error']['message']))
 
-        return json.loads(response[1]) if json_format_response else response
+        return response.json() if json_format_response else response.text
 
 
     def realTimeEventStream(self, on_open=None, on_message=None, on_close=None, on_error=None):
@@ -354,8 +354,9 @@ class Pushbullet():
 
         data = json.dumps(data)
 
-        self._response = self._h.request(self.base_url + self._REST_URLS['ephemerals'], method='POST', body=data,
-                                         headers={'Content-Type': 'application/json'})
+        self._response = requests.post(self.base_url + self._REST_URLS['ephemerals'],
+                                      data=data,
+                                      headers={'Access-Token': self.access_token, 'Content-Type': 'application/json'})
 
         return self._getResponse(json_format_response=json_format_response)
 
@@ -388,8 +389,9 @@ class Pushbullet():
 
         data = json.dumps(data)
 
-        self._response = self._h.request(self.base_url + self._REST_URLS['ephemerals'], method='POST', body=data,
-                                         headers={'Content-Type': 'application/json'})
+        self._response = requests.post(self.base_url + self._REST_URLS['ephemerals'],
+                                       data=data,
+                                       headers={'Access-Token': self.access_token, 'Content-Type': 'application/json'})
 
         return self._getResponse(json_format_response=json_format_response)
 

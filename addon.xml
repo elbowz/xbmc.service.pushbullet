@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="service.pushbullet"
        name="Pushbullet"
-       version="0.8.26b2"
-       provider-name="muttley,Rick Phillips (ruuk)">
+       version="0.8.30"
+       provider-name="Emanuele Palombo (muttley),Rick Phillips (ruuk)">
     <requires>
         <import addon="xbmc.addon" version="12.0.0"/>
         <import addon="xbmc.python" version="2.1.0"/>
-        <import addon="script.module.httplib2" version="0.8.0"/>
+        <import addon="script.module.requests" version="2.9.1"/>
         <import addon="script.module.six" version="1.7.3"/>
         <import addon="script.module.youtube.dl" version="14.1104.0"/>
         <import addon="script.module.requests" version="2.3.0"/>
