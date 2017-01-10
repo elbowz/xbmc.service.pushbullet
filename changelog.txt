@@ -1,3 +1,6 @@
+0.8.32
+- Added external libs: ndg, pyasn1, pyOpenSSL (#29)
+
 0.8.30
 - Fixed issue on ssl connection: 'EOF occurred in violation of protocol (_ssl.c:590)' (#29)
 - Removed httplib2 in favour of requests lib

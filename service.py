@@ -17,7 +17,6 @@ __addonicon__ = common.__addonicon__
 
 class Service:
     def __init__(self):
-
         common.log('Service version %s starting' % __addonversion__)
 
         self.pushbullet = None
